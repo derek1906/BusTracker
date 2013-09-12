@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <link type="text/css" rel="stylesheet" href="css.css">
+        <link type="text/css" rel="stylesheet" href="jquery.mobile-1.2.1.min.css">
+        <script src="jquery.js"></script>
+        <script src="jquery.mobile-1.3.2.min.js"></script>
+        <script src="js.js"></script>
+    </head>
+    <body>
+        <!-- Templates -->
+        <div data-role="header" data-id="default" data-position="fixed" id="templateHeader">
+             <h1>MTD Bus Tracker</h1>
+        </div>
+        <div data-role="footer" data-id="default" data-position="fixed" id="templateFooter">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#busArrival" data-icon="star">Bus Arrivals</a></li>
+                    <li><a href="#" data-icon="search">Coming Soon</a></li>
+                    <li><a href="#about" data-icon="info">About</a></li>
+                </ul>
+            </div>
+        </div>
+        <!------------>
+
+        <div data-role="page" id="busArrival" data-linkName="busArrival" class="customHeader">
+            <div data-role="header" data-position="fixed">
+                <h1>MTD Bus Tracker</h1>
+                <a data-icon="home" id="gps" class="ui-btn-right">GPS</a>
+            </div>
+            <div data-role="content">
+                Click on <b>GPS</b> to get closest stop or
+                <hr/>
+                Enter MTD stop name: <img src="http://i.imgur.com/gB763dU.gif" class="loadingImg"/>
+                <br />
+                <input id="stopSearchInput" type="search"/>
+                <br />
+                <ul data-role="listview" id="stopSearchResults" data-autodividers="true"></ul>
+            </div>
+        </div>
+
+        <div data-role="page" id="busArrivalShow" data-linkName="busArrival" class="customHeader">
+            <div data-role="header" data-position="fixed">
+                <a href="#busArrival" data-icon="arrow-l">Back</a>
+                <h1>MTD Bus Tracker</h1>
+            </div>
+            <div data-role="content">
+                <div id="busArrivalDesc"></div>
+                <div id="lastUpdated"></div><br/>
+                <ul data-role="listview" id="busArrialResults"></ul>
+            </div>
+        </div>
+
+        <div data-role="page" id="vehicleDetailShow" data-linkName="busArrival" class="customHeader">
+            <div data-role="header" data-position="fixed">
+                <a href="#busArrivalShow" data-icon="arrow-l">Back</a>
+                <h1>MTD Bus Tracker</h1>
+            </div>
+            <div data-role="content">
+                <div id="vehicleDetailDesc">
+                    <h3><span id="vehicleName"></span> (ID: <span id="vehicleId"></span>)</h3>
+                    <br/>
+                    <ul data-role="listview">
+                        <li data-role="list-divider">Current Next Stop</li>
+                        <li><a id="vehicleNextStop"></a></li>            
+                        <li data-role="list-divider">Current Previous Stop</li>
+                        <li><a id="vehiclePrevStop"></a></li>
+                        <li data-role="list-divider">Depart from</li>
+                        <li><a id="vehicleDeparture"></a></li>
+                        <li data-role="list-divider">Destination</li>
+                        <li><a id="vehicleDestination"></a></li>
+                        <li data-role="list-divider">Current Location</li>
+                        <li><a id="vehicleLanLon"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div data-role="page" id="about" data-linkName="about">
+            <div data-role="content">
+                Author: Derek 2013<br/>
+                All data are provided and owned by <a href="//www.cumtd.com" target="_blank">CUMTD</a>.<br/>
+                <button id="customRequest" data-inline="true" data-mini="true">Debug</button>
+                <hr/>
+                <button id="getAPIUsage">Get API Usage</button>
+                <div id="getAPIUsageOutput"></div>
+            </div>
+        </div>
+
+    </body>
+</html>
