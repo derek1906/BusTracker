@@ -71,6 +71,7 @@ $(function(){
     $("#gps").click(function(){
         $("#stopSearchResults").empty();
         $("<li>").html("Getting your location...").appendTo("#stopSearchResults");
+        $('#stopSearchResults').listview('refresh');
         navigator.geolocation.getCurrentPosition(function(geo){
             var lat = geo.coords.latitude,
                 lon = geo.coords.longitude;
@@ -209,7 +210,7 @@ $(function(){
                     });
                 });
             }else{
-                $("<li>").html("No bus routes available.").appendTo("#busArrialResults");
+                $("<li>").html("No bus routes currently available.").appendTo("#busArrialResults");
             }
             $('#busArrialResults').listview('refresh');
         });
