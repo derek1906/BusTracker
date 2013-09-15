@@ -308,7 +308,7 @@ $(function(){
     }
 
     function showGoogleMap(location){
-          window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_system", 'location=yes');
+          window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_system");
     }
 
     $("[data-role=page]").trigger('pagecreate');

@@ -9,6 +9,6 @@
 	<author href="http://derek1906.site50.net">
         Derek Leung
     </author>
-
-    <plugin name="InAppBrowser" value="org.apache.cordova.InAppBrowser" />
+    
+    <preference name="permissions" value="none"/>
 </widget>
