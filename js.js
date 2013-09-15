@@ -5,6 +5,35 @@ $(function(){
     };
 
     const KEY = "77b92e5ceef640868adfc924c1735ac3";
+    var stops = {};
+
+    sendRequest("GetStops", {}, function(data){
+        var list = data.stops;
+        $(list).each(function(){
+            stops[this.stop_id] = this;
+        });
+    }, function(err){
+        alert("Can't reach MTD server. Please make sure you have a working and fast internet connection.");
+        console.log("Error:", err);
+    });
+
+    function getStopDetails(name){
+        parts = name.toUpperCase().split(":");
+        var selected = stops[parts[0]];
+
+        if(parts.length == 1){
+            return selected;
+        }else{
+            var obj = selected;
+            $(selected.stop_points).each(function(){
+                if(this.stop_id == name){
+                    obj = this;
+                }
+            });
+            return obj;
+        }
+    }
+
 
     $("#templateHeader").clone().removeAttr("id").prependTo("[data-role=page]:not(.customHeader)");
     $("#templateHeader").remove();
@@ -139,15 +168,19 @@ $(function(){
         }
     });
 
-    function sendRequest(action, data, callback){
+    function sendRequest(action, data, callback, fail){
         $(".loadingImg").show();
         $.ajax({
             url: "http://developer.cumtd.com/api/v2.2/json/" + action,
             dataType: "jsonp",
+            timeout: 10000,
             data: $.extend({key: KEY}, data)
         }).done(function(data){
             $(".loadingImg").hide();
-            callback(data)
+            callback(data);
+        }).fail(function(err){
+            $(".loadingImg").hide();
+            fail(err);
         });
     }
 
@@ -230,31 +263,30 @@ $(function(){
                     .click(function(){
                         showGoogleMap(bus.location);
                     });
-                sendRequest("GetStop", {
-                    stop_id: [bus.previous_stop_id,
-                              bus.next_stop_id,
-                              bus.origin_stop_id,
-                              bus.destination_stop_id].join(";")
-                }, function(data){
-                    $([
-                        $("#vehiclePrevStop"),
-                        $("#vehicleNextStop"),
-                        $("#vehicleDeparture"),
-                        $("#vehicleDestination")
-                    ]).each(function(i){
-                        console.log(this);
-                        this
-                            .html(data.stops[i].stop_name)
-                            .css("font-weight", "bold")
-                            .data("location", {
-                                lat: data.stops[i].stop_points[0].stop_lat,
-                                lon: data.stops[i].stop_points[0].stop_lon
-                            })
-                            .unbind("click")
-                            .click(function(){
-                                showGoogleMap($(this).data("location"));
-                            });
-                    })
+
+                var queryList = [
+                    bus.previous_stop_id,
+                    bus.next_stop_id,
+                    bus.origin_stop_id,
+                    bus.destination_stop_id];
+                $([
+                    $("#vehiclePrevStop"),
+                    $("#vehicleNextStop"),
+                    $("#vehicleDeparture"),
+                    $("#vehicleDestination")
+                ]).each(function(i){
+                    var stopData = getStopDetails(queryList[i]);
+                    this
+                        .html(stopData.stop_name)
+                        .css("font-weight", "bold")
+                        .data("location", {
+                            lat: stopData.stop_lat,
+                            lon: stopData.stop_lon
+                        })
+                        .unbind("click")
+                        .click(function(){
+                            showGoogleMap($(this).data("location"));
+                        });
                 });
             }
         });
@@ -276,7 +308,7 @@ $(function(){
     }
 
     function showGoogleMap(location){
-          window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_blank");
+          window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_system");
     }
 
     $("[data-role=page]").trigger('pagecreate');
