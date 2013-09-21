@@ -1,5 +1,9 @@
 $(function(){
 
+    if(location.hash != "" && location.hash != "#busArrival"){
+        $.mobile.changePage("#busArrival");
+    }
+
     Number.prototype.addZero = function(){
     	return (this < 10 ? "0" : "") + this;
     };
@@ -204,6 +208,7 @@ $(function(){
             $("#busArrialResults").empty();
             
             if(data.departures.length){
+                var availableStops = {};  //Store a list of stop directions
                 $(data.departures).each(function(){
                     var expMin = this.expected_mins,
                         expTime = new Date(this.expected),
@@ -216,6 +221,7 @@ $(function(){
                                 id: this.vehicle_id,
                                 headsign: this.headsign
                             })
+                            .data("stop_id", this.stop_id)
                             .appendTo(entry);
                     $("<span>")
                         .addClass("routeName")
@@ -238,10 +244,24 @@ $(function(){
                     $(block).click(function(){
                         $.mobile.changePage("#vehicleDetailShow");
                         getVehicleById($(this).data("vehicle"));
-                        //var location = $(this).data("location");
-                        //window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_blank");
                     });
+
+                    availableStops[this.stop_id] = true;
                 });
+                //Create <select> to filter stops
+                availableStops = Object.keys(availableStops).sort();
+                
+                var block = $("<li>").prependTo("#busArrialResults"),
+                    select = $("<select>").appendTo(block),
+                    all = $("<optgroup>").attr("label", "All").append("<option>All</option>").appendTo(select);
+                    platforms = $("<optgroup>").attr("label", "Platforms").appendTo(select);
+                $(availableStops).each(function(){
+                    $("<option>")
+                        .html(getStopDetails(this).stop_name)
+                        .appendTo(platforms);
+                })
+                select.selectmenu({ mini: true });
+                block.trigger("create");
             }else{
                 $("<li>").html("No bus routes currently available.").appendTo("#busArrialResults");
             }
