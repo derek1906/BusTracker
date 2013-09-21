@@ -210,7 +210,8 @@ $(function(){
             
             if(data.departures.length){
                 var availablePlatforms = {},  //Store a list of stop platforms
-                    availableDirections = {}; //Store a list of directions
+                    availableDirections = {}, //Store a list of directions
+                    availableRoutes = {};     //Store a list of routes
                 $(data.departures).each(function(){
                     console.log(this);
                     var expMin = this.expected_mins,
@@ -219,7 +220,8 @@ $(function(){
                         entry = $("<li>")
                             .appendTo("#busArrialResults")
                             .data("stop_id", this.stop_id)
-                            .data("direction", this.trip.direction),
+                            .data("direction", this.trip.direction)
+                            .data("route", this.headsign),
                         block = $("<a>")
                             .data("location", this.location)
                             .data("vehicle", {
@@ -252,11 +254,13 @@ $(function(){
 
                     availablePlatforms[this.stop_id] = true;
                     availableDirections[this.trip.direction] = true;
+                    availableRoutes[this.headsign] = true;
                 });
 
                 //Create <select> to filter stops
                 availablePlatforms = Object.keys(availablePlatforms).sort();
                 availableDirections = Object.keys(availableDirections).sort();
+                availableRoutes = Object.keys(availableRoutes).sort();
 
                 var block = $("<li>").attr("id", "filter").prependTo("#busArrialResults"),
                     select = $("<select>").appendTo(block),
@@ -268,7 +272,8 @@ $(function(){
                             .html("All")
                             .appendTo(select);
                     platforms = $("<optgroup>").attr("label", "Platforms").appendTo(select),
-                    directions = $("<optgroup>").attr("label", "Directions").appendTo(select);
+                    directions = $("<optgroup>").attr("label", "Directions").appendTo(select)
+                    routes = $("<optgroup>").attr("label", "Routes").appendTo(select);
                 $(availablePlatforms).each(function(){
                     $("<option>")
                         .html(getStopDetails(this).stop_name)
@@ -277,7 +282,7 @@ $(function(){
                             value: this
                         })
                         .appendTo(platforms);
-                })
+                });
                 $(availableDirections).each(function(){
                     $("<option>")
                         .html(this)
@@ -286,7 +291,17 @@ $(function(){
                             value: this
                         })
                         .appendTo(directions);
-                })
+                });
+
+                $(availableRoutes).each(function(){
+                    $("<option>")
+                        .html(this)
+                        .data("filter", {
+                            type: "route",
+                            value: this
+                        })
+                        .appendTo(routes);
+                });
 
                 select.selectmenu({ mini: true });
                 block.trigger("create");
@@ -319,6 +334,15 @@ $(function(){
             case "direction":
                 $(list).each(function(){
                     if($(this).data("direction") == option.value){
+                       $(this).stop().slideDown(700);
+                    }else{
+                        $(this).stop().slideUp(700);
+                    }
+                });
+                break;
+            case "route":
+                $(list).each(function(){
+                    if($(this).data("route") == option.value){
                        $(this).stop().slideDown(700);
                     }else{
                         $(this).stop().slideUp(700);
