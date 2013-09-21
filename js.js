@@ -209,14 +209,17 @@ $(function(){
             $("#busArrialResults").empty();
             
             if(data.departures.length){
-                var availableStops = {};  //Store a list of stop directions
+                var availablePlatforms = {},  //Store a list of stop platforms
+                    availableDirections = {}; //Store a list of directions
                 $(data.departures).each(function(){
+                    console.log(this);
                     var expMin = this.expected_mins,
                         expTime = new Date(this.expected),
                         routeName = this.headsign,
                         entry = $("<li>")
                             .appendTo("#busArrialResults")
-                            .data("stop_id", this.stop_id),
+                            .data("stop_id", this.stop_id)
+                            .data("direction", this.trip.direction),
                         block = $("<a>")
                             .data("location", this.location)
                             .data("vehicle", {
@@ -247,11 +250,13 @@ $(function(){
                         getVehicleById($(this).data("vehicle"));
                     });
 
-                    availableStops[this.stop_id] = true;
+                    availablePlatforms[this.stop_id] = true;
+                    availableDirections[this.trip.direction] = true;
                 });
 
                 //Create <select> to filter stops
-                availableStops = Object.keys(availableStops).sort();
+                availablePlatforms = Object.keys(availablePlatforms).sort();
+                availableDirections = Object.keys(availableDirections).sort();
 
                 var block = $("<li>").attr("id", "filter").prependTo("#busArrialResults"),
                     select = $("<select>").appendTo(block),
@@ -262,8 +267,9 @@ $(function(){
                             })
                             .html("All")
                             .appendTo(select);
-                    platforms = $("<optgroup>").attr("label", "Platforms").appendTo(select);
-                $(availableStops).each(function(){
+                    platforms = $("<optgroup>").attr("label", "Platforms").appendTo(select),
+                    directions = $("<optgroup>").attr("label", "Directions").appendTo(select);
+                $(availablePlatforms).each(function(){
                     $("<option>")
                         .html(getStopDetails(this).stop_name)
                         .data("filter", {
@@ -272,6 +278,16 @@ $(function(){
                         })
                         .appendTo(platforms);
                 })
+                $(availableDirections).each(function(){
+                    $("<option>")
+                        .html(this)
+                        .data("filter", {
+                            type: "direction",
+                            value: this
+                        })
+                        .appendTo(directions);
+                })
+
                 select.selectmenu({ mini: true });
                 block.trigger("create");
 
@@ -289,16 +305,26 @@ $(function(){
             list = $("#busArrialResults > li:not(#filter)");
         switch(option.type){
             case "all":
-               list.slideDown(700);
+               list.stop().slideDown(700);
                 break;
             case "platforms":
                 $(list).each(function(){
-                    if($(this).data("stop_id") != option.value){
-                       $(this).slideDown(700);
+                    if($(this).data("stop_id") == option.value){
+                       $(this).stop().slideDown(700);
                     }else{
-                        $(this).slideUp(700);
+                        $(this).stop().slideUp(700);
                     }
                 });
+                break;
+            case "direction":
+                $(list).each(function(){
+                    if($(this).data("direction") == option.value){
+                       $(this).stop().slideDown(700);
+                    }else{
+                        $(this).stop().slideUp(700);
+                    }
+                });
+                break;
          }
     }
 
