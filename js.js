@@ -195,6 +195,7 @@ $(function(){
             //Auto update
             liveUpdates.updateInterval = setTimeout(function(){
                 getDepartureByStop(id);
+                runFilter();
             }, CHECK_INTERVAL);
             var page = $("#busArrialResults").parent();
             if(data.status.code != 200){
@@ -214,14 +215,14 @@ $(function(){
                         expTime = new Date(this.expected),
                         routeName = this.headsign,
                         entry = $("<li>")
-                            .appendTo("#busArrialResults"),
+                            .appendTo("#busArrialResults")
+                            .data("stop_id", this.stop_id),
                         block = $("<a>")
                             .data("location", this.location)
                             .data("vehicle", {
                                 id: this.vehicle_id,
                                 headsign: this.headsign
                             })
-                            .data("stop_id", this.stop_id)
                             .appendTo(entry);
                     $("<span>")
                         .addClass("routeName")
@@ -248,25 +249,57 @@ $(function(){
 
                     availableStops[this.stop_id] = true;
                 });
+
                 //Create <select> to filter stops
                 availableStops = Object.keys(availableStops).sort();
-                
-                var block = $("<li>").prependTo("#busArrialResults"),
+
+                var block = $("<li>").attr("id", "filter").prependTo("#busArrialResults"),
                     select = $("<select>").appendTo(block),
-                    all = $("<optgroup>").attr("label", "All").append("<option>All</option>").appendTo(select);
+                    all = $("<option>")
+                            .attr("label", "All")
+                            .data("filter",{
+                                type: "all"
+                            })
+                            .html("All")
+                            .appendTo(select);
                     platforms = $("<optgroup>").attr("label", "Platforms").appendTo(select);
                 $(availableStops).each(function(){
                     $("<option>")
                         .html(getStopDetails(this).stop_name)
+                        .data("filter", {
+                            type: "platforms",
+                            value: this
+                        })
                         .appendTo(platforms);
                 })
                 select.selectmenu({ mini: true });
                 block.trigger("create");
+
+                select.change(runFilter);
+
             }else{
                 $("<li>").html("No bus routes currently available.").appendTo("#busArrialResults");
             }
             $('#busArrialResults').listview('refresh');
         });
+    }
+
+    function runFilter(){
+        var option = $("option:selected").data("filter"),
+            list = $("#busArrialResults > li:not(#filter)");
+        switch(option.type){
+            case "all":
+               list.slideDown(700);
+                break;
+            case "platforms":
+                $(list).each(function(){
+                    if($(this).data("stop_id") != option.value){
+                       $(this).slideDown(700);
+                    }else{
+                        $(this).slideUp(700);
+                    }
+                });
+         }
     }
 
     function getVehicleById(v){
