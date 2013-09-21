@@ -3,7 +3,7 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id="com.Derek.BusTracker"
-        version="1.0.0.1">
+        version="1.0.1">
 	<name>Bus Tracker</name>
 	<description>MTD Bus Tracker</description>
 	<author href="http://derek1906.site50.net">
