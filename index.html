@@ -22,7 +22,7 @@
             <div data-role="navbar">
                 <ul>
                     <li><a href="#busArrival" data-icon="star">Bus Arrivals</a></li>
-                    <li><a href="#" data-icon="search">Coming Soon</a></li>
+                    <li><a href="#routesData" data-icon="search">Routes Data</a></li>
                     <li><a href="#about" data-icon="info">About</a></li>
                 </ul>
             </div>
@@ -79,6 +79,19 @@
                         <li><a id="vehicleLanLon"></a></li>
                     </ul>
                 </div>
+            </div>
+        </div>
+
+
+        <div data-role="page" id="routesData" data-linkName="routesData">
+            <div data-role="content">
+                <ul data-role="listview" data-filter="true" id="busRoutes"></ul>
+            </div>
+        </div>
+
+        <div data-role="page" id="busRouteMap" data-linkName="routesData">
+            <div data-role="content">
+            	<div id="busRouteMapView"></div>
             </div>
         </div>
 

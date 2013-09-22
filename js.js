@@ -1,3 +1,17 @@
+function loadGoogleMaps() {
+    var script = document.createElement("script"),
+        GMKEY = "AIzaSyCvGrUsBG044lpchPNV17MfN_J4xWadYEM";
+    script.type = "text/javascript";
+    script.src = "https://maps.googleapis.com/maps/api/js?key=" + GMKEY + "&sensor=true&callback=test";
+    document.body.appendChild(script);
+}
+
+function test () {
+    
+}
+
+window.onload = loadGoogleMaps;
+
 $(function(){
 
     if(location.hash != "" && location.hash != "#busArrival"){
@@ -158,6 +172,60 @@ $(function(){
             timeDisplayInterval = undefined;
             updateInterval = undefined;
         }
+    });
+
+    $("#routesData").on("pageshow", function(){
+        $("#busRouteMapView").css({
+            width: "100%",
+            height: $(window).height()*0.75
+        });
+        sendRequest("getRoutes", {}, function(data){
+            $("#busRoutes").empty();
+            $(data.routes).each(function(){
+                var entry = $("<li>").appendTo("#busRoutes"),
+                    block = $("<a>").appendTo(entry);
+                block
+                    .html(this.route_long_name)
+                    .attr("data-rel", "dialog")
+                    .attr("href", "#busRouteMap")
+                    .data("route", this)
+                    .click(function(){
+                        var mapView = $("#busRouteMapView");
+                        mapView.empty();
+                        sendRequest("GetTripsByRoute",{
+                            route_id: $(this).data("route").route_id
+                        }, function(data){
+                            if(data.trips){
+                                sendRequest("GetShape", {
+                                    shape_id: data.trips[0].shape_id
+                                }, function(data){
+                                    setTimeout(function(){
+                                        var mapOptions = {
+                                            zoom: 14,
+                                            center: new google.maps.LatLng(40.099, -88.226),
+                                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                                        }
+                                        var map = new google.maps.Map($('#busRouteMapView')[0], mapOptions);
+                                        var coordinates = [];
+                                        $(data.shapes).each(function(){
+                                            coordinates.push(new google.maps.LatLng(this.shape_pt_lat, this.shape_pt_lon));
+                                        })
+                                        var path = new google.maps.Polyline({
+                                            path: coordinates,
+                                            strokeColor: '#FF0000',
+                                            strokeOpacity: 1.0,
+                                            strokeWeight: 2
+                                        });
+
+                                        path.setMap(map);
+                                    }, 1000);
+                                });
+                            }
+                        });
+                    });
+            });
+            $('#busRoutes').listview('refresh');
+        });
     });
 
     $("#customRequest").click(function(){

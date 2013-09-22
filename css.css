@@ -13,3 +13,11 @@ body{
     text-align: center;
 }
 
+.ui-dialog-contain {
+	width: 92.5%;
+	max-width: none;
+	margin: 5% auto 15px auto;
+	padding: 0;
+	position: relative;
+	top: -15px;
+}
