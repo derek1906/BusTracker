@@ -1,14 +1,37 @@
+function testing(){
+    chaining([
+        "[@7.0.41200832@][1][1238430123625]/17__I3UIMF",
+        "[@7.0.41200832@][1][1238430123625]/18__I5UIF",
+        "[@7.0.41200832@][1][1238430123625]/18__I5UIMF"
+    ], function(data){
+        console.log(data);
+    });
+}
+
+function chaining(list, callback){
+    var i = 0,
+        data = [];
+    (function repeat(){
+        sendRequest("GetShape", {shape_id: list[i]}, function(d){
+            if(i++ < list.length){
+                data.push(d);
+                repeat();
+            }else{
+                callback(data);
+            }
+        });
+    })();
+}
+
 function loadGoogleMaps() {
     var script = document.createElement("script"),
-        GMKEY = "AIzaSyCvGrUsBG044lpchPNV17MfN_J4xWadYEM";
+        GMKEY = "AIzaSyDgdkU0NXg128pOqzYfld2EGP3Sk3Gbnh0";
     script.type = "text/javascript";
-    script.src = "https://maps.googleapis.com/maps/api/js?key=" + GMKEY + "&sensor=true&callback=test";
+    script.src = "https://maps.googleapis.com/maps/api/js?key=" + GMKEY + "&sensor=true&callback=GMTEMP";
     document.body.appendChild(script);
 }
 
-function test () {
-    
-}
+function GMTEMP(){}
 
 window.onload = loadGoogleMaps;
 
@@ -21,6 +44,14 @@ $(function(){
     Number.prototype.addZero = function(){
     	return (this < 10 ? "0" : "") + this;
     };
+
+
+    $("#busRouteMapView").css({
+        width: "100%",
+        height: $(window).height()*0.75
+    });
+
+
 
     const KEY = "77b92e5ceef640868adfc924c1735ac3";
     var stops = {};
@@ -175,10 +206,6 @@ $(function(){
     });
 
     $("#routesData").on("pageshow", function(){
-        $("#busRouteMapView").css({
-            width: "100%",
-            height: $(window).height()*0.75
-        });
         sendRequest("getRoutes", {}, function(data){
             $("#busRoutes").empty();
             $(data.routes).each(function(){
@@ -186,8 +213,6 @@ $(function(){
                     block = $("<a>").appendTo(entry);
                 block
                     .html(this.route_long_name)
-                    .attr("data-rel", "dialog")
-                    .attr("href", "#busRouteMap")
                     .data("route", this)
                     .click(function(){
                         var mapView = $("#busRouteMapView");
@@ -196,35 +221,167 @@ $(function(){
                             route_id: $(this).data("route").route_id
                         }, function(data){
                             if(data.trips){
-                                sendRequest("GetShape", {
-                                    shape_id: data.trips[0].shape_id
-                                }, function(data){
-                                    setTimeout(function(){
-                                        var mapOptions = {
-                                            zoom: 14,
-                                            center: new google.maps.LatLng(40.099, -88.226),
-                                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                                        }
-                                        var map = new google.maps.Map($('#busRouteMapView')[0], mapOptions);
-                                        var coordinates = [];
-                                        $(data.shapes).each(function(){
-                                            coordinates.push(new google.maps.LatLng(this.shape_pt_lat, this.shape_pt_lon));
+                                /*
+                                console.log(data.trips);
+                                //find average route
+                                var analyze = {};
+                                $(data.trips).each(function(i){
+                                    console.error(i)
+                                    console.log($.extend(true, {}, analyze));
+                                    var code = this.trip_id.match(/@[^@]+@/);
+                                    if(code){
+                                        code = code[0];
+                                    }else{return false;}
+                                    if(analyze[code]){
+                                        analyze[code].amount++;
+                                        analyze[code][this.direction] = this.shape_id;
+                                    }else{
+                                        analyze[code] = {amount: 1};
+                                        analyze[code][this.direction] = this.shape_id;
+                                    }
+                                });
+                                console.info($.extend(true, {}, analyze));
+                                var temp = [0, undefined];
+                                for(var key in analyze){
+                                    if(analyze[key].amount > temp[0]){
+                                        temp = [analyze[key].amount, analyze[key]];
+                                    }
+                                }
+                                temp = temp[1];
+                                console.log(temp);
+                                delete temp.amount;
+                                var list = [];
+                                for(var key in temp){
+                                    list.push([key, temp[key]]);
+                                }
+                                */
+                                var analyze = {};
+                                $(data.trips).each(function(i){
+                                    if(analyze[this.shape_id]){
+                                        analyze[this.shape_id].amount++;
+                                        analyze[this.shape_id].direction = this.direction;
+                                    }else{
+                                        analyze[this.shape_id] = {amount: 1, direction: this.direction, shape_id: this.shape_id};
+                                    }
+                                });
+
+                                var max = [0, 0],
+                                    maxShapes = [undefined, undefined];
+                                for(var key in analyze){
+                                    if(analyze[key].amount > max[0]){
+                                        maxShapes = [analyze[key], maxShapes[0]];
+                                        max = [analyze[key].amount, max[0]];
+                                    }else if(analyze[key].amount > max[1]){
+                                        maxShapes[1] = analyze[key];
+                                        max[1] = analyze[key].amount;
+                                    }
+                                }
+                                console.log(maxShapes.slice(0));
+
+                                if(maxShapes[0].direction == maxShapes[1].direction){
+                                    maxShapes.pop();
+                                    alert("Same direction.");
+                                }
+                                console.log(maxShapes.slice(0));
+
+                                var i = 0,
+                                    data = [];
+                                (function repeat(callback){
+                                    if(i < maxShapes.length){
+                                        sendRequest("GetShape", {shape_id: maxShapes[i].shape_id}, function(d){
+                                            data.push(d);
+                                            i++;
+                                            repeat(callback);
+                                        });
+                                    }else{
+                                        callback(data);
+                                    }
+                                })(function(data){
+                                    showGoogleMaps({}, function(map){
+
+                                        var legend = $("<div>").css({background: "#FFF", border: "2px solid black", padding: 5});
+                                        $(maxShapes).each(function(i){
+                                            $("<div>").html(["Red", "Blue"][i] + ": " + maxShapes[i].direction).appendTo(legend);
                                         })
-                                        var path = new google.maps.Polyline({
-                                            path: coordinates,
-                                            strokeColor: '#FF0000',
-                                            strokeOpacity: 1.0,
-                                            strokeWeight: 2
+                                        map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend[0]);
+
+                                        $(data).each(function(i){
+                                            var coordinates = [];
+                                            $(this.shapes).each(function(){
+                                                coordinates.push(new google.maps.LatLng(this.shape_pt_lat, this.shape_pt_lon));
+                                            });
+                                            var path = new google.maps.Polyline({
+                                                path: coordinates,
+                                                strokeColor: ['#FF0000', '#0000FF'][i],
+                                                strokeOpacity: 0.5,
+                                                strokeWeight: 2
+                                            });
+
+                                            path.setMap(map);
                                         });
 
-                                        path.setMap(map);
-                                    }, 1000);
+                                    });
                                 });
+
+                                // sendRequest("GetShape", {
+                                //     shape_id: data.trips[Math.floor(Math.random()*data.trips.length)].shape_id
+                                // }, function(data){
+                                //     showGoogleMaps({}, function(map){
+                                //         var coordinates = [];
+                                //         $(data.shapes).each(function(){
+                                //             coordinates.push(new google.maps.LatLng(this.shape_pt_lat, this.shape_pt_lon));
+                                //         })
+                                //         var path = new google.maps.Polyline({
+                                //             path: coordinates,
+                                //             strokeColor: '#FF0000',
+                                //             strokeOpacity: 1.0,
+                                //             strokeWeight: 2
+                                //         });
+
+                                //         path.setMap(map);
+                                //     });
+                                // });
                             }
                         });
                     });
             });
             $('#busRoutes').listview('refresh');
+        });
+    });
+
+    function showGoogleMaps(options, callback){
+        var mapView = $("#busRouteMapView").empty();
+
+        $("#busRouteMap").unbind("pageshow").on("pageshow", function(){
+            options = $.extend(
+                {
+                    zoom: 14,
+                    center: new google.maps.LatLng(40.099, -88.226),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                }, options),
+            callback = callback || function(){};
+            var map = new google.maps.Map(mapView[0], options);
+            callback(map);
+        });
+
+        $.mobile.changePage("#busRouteMap");
+    }
+
+    $("#reroutes").on("pageshow", function(){
+        sendRequest("GetReroutes", {}, function(data){
+            if(data.reroutes.length){
+                $("#rerouteList").empty();
+                $(data.reroutes).each(function(){
+                    var entry = $("<li>").appendTo("#rerouteList"),
+                        h3 = $("<h3>").appendTo(entry),
+                        date = $("<p>").appendTo(entry),
+                        p = $("<p>").appendTo(entry);
+                    h3.text(this.message);
+                    date.html(["From ", this.start_date, " to ", this.end_date].join(""));
+                    p.html(this.description.replace(/\n/g, "<br>"));
+                });
+                $('#rerouteList').listview('refresh');
+            }
         });
     });
 
@@ -255,6 +412,7 @@ $(function(){
             fail(err);
         });
     }
+    window.sendRequest = sendRequest;
 
     function getDepartureByStop(id){
         sendRequest("GetDeparturesByStop", {stop_id: id}, function(data){
