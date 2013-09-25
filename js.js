@@ -212,7 +212,7 @@ $(function(){
                 var entry = $("<li>").appendTo("#busRoutes"),
                     block = $("<a>").appendTo(entry);
                 block
-                    .html(this.route_long_name)
+                    .html(this.route_long_name + " (" + this.route_short_name + ")")
                     .data("route", this)
                     .click(function(){
                         var mapView = $("#busRouteMapView");
@@ -221,40 +221,7 @@ $(function(){
                             route_id: $(this).data("route").route_id
                         }, function(data){
                             if(data.trips){
-                                /*
-                                console.log(data.trips);
-                                //find average route
-                                var analyze = {};
-                                $(data.trips).each(function(i){
-                                    console.error(i)
-                                    console.log($.extend(true, {}, analyze));
-                                    var code = this.trip_id.match(/@[^@]+@/);
-                                    if(code){
-                                        code = code[0];
-                                    }else{return false;}
-                                    if(analyze[code]){
-                                        analyze[code].amount++;
-                                        analyze[code][this.direction] = this.shape_id;
-                                    }else{
-                                        analyze[code] = {amount: 1};
-                                        analyze[code][this.direction] = this.shape_id;
-                                    }
-                                });
-                                console.info($.extend(true, {}, analyze));
-                                var temp = [0, undefined];
-                                for(var key in analyze){
-                                    if(analyze[key].amount > temp[0]){
-                                        temp = [analyze[key].amount, analyze[key]];
-                                    }
-                                }
-                                temp = temp[1];
-                                console.log(temp);
-                                delete temp.amount;
-                                var list = [];
-                                for(var key in temp){
-                                    list.push([key, temp[key]]);
-                                }
-                                */
+
                                 var analyze = {};
                                 $(data.trips).each(function(i){
                                     if(analyze[this.shape_id]){
