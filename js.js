@@ -413,7 +413,7 @@ $(function(){
                         entry = $("<li>")
                             .appendTo("#busArrialResults")
                             .data("stop_id", this.stop_id)
-                            .data("direction", this.trip.direction)
+                            .data("direction", (this.trip ? this.trip.direction : "N/A"))
                             .data("route", this.headsign),
                         block = $("<a>")
                             .data("location", this.location)
@@ -446,7 +446,7 @@ $(function(){
                     });
 
                     availablePlatforms[this.stop_id] = true;
-                    availableDirections[this.trip.direction] = true;
+                    if(this.trip) availableDirections[this.trip.direction] = true;
                     availableRoutes[this.headsign] = true;
                 });
 
