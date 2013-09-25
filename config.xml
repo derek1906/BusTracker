@@ -15,4 +15,6 @@
 
     <access origin="*" />
 
+    <gap:platform name="android" />
+
 </widget>
