@@ -604,7 +604,14 @@ $(function(){
     }
 
     function showGoogleMap(location){
-          window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_system");
+          //window.open("https://www.google.com/maps?q=(" + location.lat + "%2C" + location.lon + ")", "_system");
+        var point = new google.maps.LatLng(location.lat, location.lon);
+        showGoogleMaps({center: point}, function(map){
+            var marker = new google.maps.Marker({
+                position: point,
+                map: map
+            });
+        });
     }
 
     $("[data-role=page]").trigger('pagecreate');
