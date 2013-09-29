@@ -615,5 +615,5 @@ $(function(){
     }
 
     //$("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
-    $.mobile.activePage.trigger('pagecreate');
+    $.mobile.activePage.trigger('pagecreate');  
 });

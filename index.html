@@ -16,7 +16,7 @@
     </head>
     <body>
         <!-- Templates -->
-        <div data-role="header" data-id="default" data-position="fixed" id="templateHeader">
+        <div data-role="header" data-id="default" data-position="fixed" id="templateHeader" data-tap-toggle="false">
              <h1>MTD Bus Tracker</h1>
         </div>
         <div data-role="footer" data-id="default" data-position="fixed" id="templateFooter" data-tap-toggle="false">
@@ -32,7 +32,7 @@
         <!------------>
 
         <div data-role="page" id="busArrival" data-linkName="busArrival" class="customHeader">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <h1>MTD Bus Tracker</h1>
                 <a data-icon="home" id="gps" class="ui-btn-right">GPS</a>
             </div>
@@ -48,7 +48,7 @@
         </div>
 
         <div data-role="page" id="busArrivalShow" data-linkName="busArrival" class="customHeader">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#busArrival" data-icon="arrow-l">Back</a>
                 <h1>MTD Bus Tracker</h1>
             </div>
@@ -60,7 +60,7 @@
         </div>
 
         <div data-role="page" id="vehicleDetailShow" data-linkName="busArrival" class="customHeader">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#busArrivalShow" data-icon="arrow-l">Back</a>
                 <h1>MTD Bus Tracker</h1>
             </div>
@@ -92,7 +92,7 @@
         </div>
 
         <div data-role="dialog" id="busRouteMap" data-linkName="routesData">
-           <div data-role="header">
+           <div data-role="header" data-tap-toggle="false">
             	<h1>Maps View</h1>
             </div>
             <div data-role="content">
