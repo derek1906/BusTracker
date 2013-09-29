@@ -614,5 +614,6 @@ $(function(){
         });
     }
 
-    $("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
+    //$("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
+    $.mobile.activePage.trigger('pagecreate');
 });
