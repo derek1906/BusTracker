@@ -614,10 +614,5 @@ $(function(){
         });
     }
 
-    $("[data-role=page]").trigger('pagecreate');
-    $("[data-role=header]").fixedtoolbar({
-        tapToggle: false
-    });
-
-
+    $("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
 });
