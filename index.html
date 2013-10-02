@@ -91,9 +91,9 @@
             </div>
         </div>
 
-        <div data-role="dialog" id="busRouteMap" data-linkName="routesData">
-           <div data-role="header" data-tap-toggle="false">
-            	<h1>Maps View</h1>
+        <div data-role="page" id="busRouteMap" data-linkName="routesData" class="customHeader customFooter">
+           <div data-role="header" data-tap-toggle="false" class="ui-bar-b">
+            	<a href="#" onclick="history.back();" data-icon="arrow-l" data-mini="true">Back</a><h1>Map View</h1>
             </div>
             <div data-role="content">
             	<div id="busRouteMapView"></div>

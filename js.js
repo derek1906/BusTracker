@@ -46,10 +46,10 @@ $(function(){
     };
 
 
-    $("#busRouteMapView").css({
-        width: "100%",
-        height: $(window).height()*0.75
-    });
+    // $("#busRouteMapView").css({
+    //     width: "100%",
+    //     height: /*$(window).height()*0.75*/ "100%"
+    // });
 
 
 
@@ -86,7 +86,7 @@ $(function(){
 
     $("#templateHeader").clone().removeAttr("id").prependTo("[data-role=page]:not(.customHeader)");
     $("#templateHeader").remove();
-    $("[data-role=page]").each(function(){
+    $("[data-role=page]:not(.customFooter)").each(function(){
         $("#templateFooter").clone().removeAttr("id").find("[href=#" + $(this).attr("data-linkName") + "]").addClass("ui-btn-active ui-state-persist").end().appendTo($(this));
     });
     $("#templateFooter").remove();
@@ -331,6 +331,10 @@ $(function(){
         var mapView = $("#busRouteMapView").empty();
 
         $("#busRouteMap").unbind("pageshow").on("pageshow", function(){
+            $("#busRouteMap > div[data-role=content]").height(
+                $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
+            );
+            console.log($("#busRouteMapView").parent().height());
             options = $.extend(
                 {
                     zoom: 14,

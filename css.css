@@ -25,3 +25,9 @@ body{
 #rerouteList > li > *{
 	white-space: normal;
 }
+
+#busRouteMap > div[data-role=content], #busRouteMapView{
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
