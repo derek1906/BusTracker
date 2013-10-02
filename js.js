@@ -281,7 +281,18 @@ $(function(){
                                                 path: coordinates,
                                                 strokeColor: ['#FF0000', '#0000FF'][i],
                                                 strokeOpacity: 0.5,
-                                                strokeWeight: 2
+                                                strokeWeight: 2,
+                                                icons: [{
+                                                    icon: {
+                                                        path: "M -3 5 L 0 0 3 5",
+                                                        scale: 1,
+                                                        strokeColor: ['#FF0000', '#0000FF'][i],
+                                                        strokeWeight: 2,
+                                                        offset: "0px"
+                                                    },
+                                                    offset: "10px",
+                                                    repeat: "100px"
+                                                }]
                                             });
 
                                             path.setMap(map);
