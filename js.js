@@ -1,4 +1,4 @@
-function testing(){
+/*function testing(){
     chaining([
         "[@7.0.41200832@][1][1238430123625]/17__I3UIMF",
         "[@7.0.41200832@][1][1238430123625]/18__I5UIF",
@@ -21,7 +21,7 @@ function chaining(list, callback){
             }
         });
     })();
-}
+}*/
 
 function loadGoogleMaps() {
     var script = document.createElement("script"),
@@ -106,9 +106,8 @@ $(function(){
 
 
 
-    $("#stopSearchInput").on("keydown", function (e) {
-        $("#stopSearchResults").empty();
-        if (e.keyCode == 13 && this.value !== "") {
+    $("#stopSearchInput").on("keyup", function (e) {
+        if (/*e.keyCode == 13 && */this.value !== "") {
             $.ajax({
                 url: "http://www.cumtd.com/autocomplete/stops/v1.0/json/search",
                 dataType: "jsonp",
@@ -139,12 +138,16 @@ $(function(){
                         };
                         $("#stopSearchResults").empty();
                         $.mobile.changePage("#busArrivalShow");
+                        $("#stopSearchInput").val("");
                     });
                 });
                 $('#stopSearchResults').listview('refresh');
             });
+        }else{
+            $("#stopSearchResults").empty();
         }
-    })
+    });
+
     $("#getAPIUsage").click(getAPIUsage);
     $("#gps").click(function(){
         $("#stopSearchResults").empty();
@@ -191,6 +194,47 @@ $(function(){
                 $('#stopSearchResults').listview('refresh');
             });
         });    
+    });
+    
+    $("#selectFromMap").click(function(){
+        showGoogleMaps({
+            title: "Select Stop"
+        }, function(map){
+            for(var key in stops){
+                var midCoor = [0, 0, 0];
+                $(stops[key].stop_points).each(function(){
+                    midCoor[0] += this.stop_lat;
+                    midCoor[1] += this.stop_lon;
+                    midCoor[2]++;
+                });
+                (function(stop){
+                    var mark = new google.maps.Marker({
+                        position: new google.maps.LatLng(midCoor[0]/midCoor[2], midCoor[1]/midCoor[2]),
+                        map: map,
+                        title: stops[key].stop_name,
+                        icon: 'http://derek1906.site50.net/works/MTDBusTracker/images/busstop.png'
+                    });
+                    google.maps.event.addListener(mark, 'click', function() {
+                        selectedStop = {
+                            id: stop,
+                            name: stops[stop].stop_name,
+                            code: stops[stop].code
+                        }
+                        $("#stopSearchResults").empty();
+                        $.mobile.changePage("#busArrivalShow");
+                    });
+                    var infowindow = new google.maps.InfoWindow({
+                        content: stops[stop].stop_name
+                    });
+                    google.maps.event.addListener(mark, 'mouseover', function() {
+                        infowindow.open(map, mark);
+                    });
+                    google.maps.event.addListener(mark, 'mouseout', function() {
+                        infowindow.close();
+                    });
+                })(key);
+            }
+        });
     });
 
     $("#busArrivalShow").on("pageshow", function(){
@@ -328,7 +372,12 @@ $(function(){
     });
 
     function showGoogleMaps(options, callback){
-        var mapView = $("#busRouteMapView").empty();
+        var title = options.title || "Map View",
+            mapView = $("#busRouteMapView").empty();
+
+        $("#busRouteMap > div > h1").text(title);
+
+        if(options.title) delete options.title;
 
         $("#busRouteMap").unbind("pageshow").on("pageshow", function(){
             $("#busRouteMap > div[data-role=content]").height(
@@ -339,11 +388,22 @@ $(function(){
                 {
                     zoom: 14,
                     center: new google.maps.LatLng(40.099, -88.226),
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    streetViewControl: false
                 }, options),
             callback = callback || function(){};
             var map = new google.maps.Map(mapView[0], options);
             callback(map);
+
+            navigator.geolocation.getCurrentPosition(function(coor){
+                new google.maps.Marker({
+                    position: new google.maps.LatLng(coor.coords.latitude, coor.coords.longitude),
+                    map: map,
+                    title:"You",
+                    icon: 'http://derek1906.site50.net/works/MTDBusTracker/images/home.png',
+                    zIndex: google.maps.Marker.MAX_ZINDEX + 1
+                });
+            });
         });
 
         $.mobile.changePage("#busRouteMap");
