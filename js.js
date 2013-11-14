@@ -42,7 +42,7 @@ $(function(){
     }
 
     Number.prototype.addZero = function(){
-    	return (this < 10 ? "0" : "") + this;
+        return (this < 10 ? "0" : "") + this;
     };
 
 
@@ -212,7 +212,7 @@ $(function(){
                         position: new google.maps.LatLng(midCoor[0]/midCoor[2], midCoor[1]/midCoor[2]),
                         map: map,
                         title: stops[key].stop_name,
-                        icon: 'http://derek1906.site50.net/works/MTDBusTracker/images/busstop.png'
+                        icon: 'http://silent-text-346.appspot.com/images/busstop.png'
                     });
                     google.maps.event.addListener(mark, 'click', function() {
                         selectedStop = {
@@ -400,7 +400,7 @@ $(function(){
                     position: new google.maps.LatLng(coor.coords.latitude, coor.coords.longitude),
                     map: map,
                     title:"You",
-                    icon: 'http://derek1906.site50.net/works/MTDBusTracker/images/home.png',
+                    icon: 'http://silent-text-346.appspot.com/images/home.png',
                     zIndex: google.maps.Marker.MAX_ZINDEX + 1
                 });
             });
@@ -632,7 +632,71 @@ $(function(){
                     .html(bus.location.lat + "," + bus.location.lon)
                     .unbind("click")
                     .click(function(){
-                        showGoogleMap(bus.location);
+                        //showGoogleMap(bus.location);
+                        showGoogleMaps({ center: gLoc(bus.location) }, function(map){
+                            var marker = new google.maps.Marker({
+                                position: gLoc(bus.location),
+                                map: map
+                            });
+                            sendRequest("GetShape", {shape_id: bus.trip.shape_id}, function(data){
+                                var min = -1, index = 0, pt = data.shapes,
+                                    lonP = bus.location.lon, latP = bus.location.lat;
+                                for(var i = 0; i < data.shapes.length; i++){
+                                    var lon = pt[i].shape_pt_lon, lat = pt[i].shape_pt_lat;
+                                    var d = distanceBetween(lat, lon, latP, lonP); //find min distance
+
+                                    if(min == -1 || d < min){
+                                        min = d; index = i;
+                                    }
+                                };
+                                var paths = pt.slice(0);
+                                paths.splice(index, 0, {
+                                    shape_pt_lat: latP,
+                                    shape_pt_lon: lonP
+                                });
+                                var passed = [], remaining = [];
+                                for(var i = 0; i < index + 1; i++){
+                                    passed.push(new google.maps.LatLng(paths[i].shape_pt_lat, paths[i].shape_pt_lon));
+                                };
+                                for(var i = index; i < paths.length; i++){
+                                    remaining.push(new google.maps.LatLng(paths[i].shape_pt_lat, paths[i].shape_pt_lon));
+                                };
+                                new google.maps.Polyline({
+                                    path: passed,
+                                    strokeColor: '#555555',
+                                    strokeOpacity: 0.6,
+                                    strokeWeight: 2,
+                                    icons: [{
+                                        icon: {
+                                            path: "M -3 5 L 0 0 3 5",
+                                            scale: 1,
+                                            strokeColor: '#555555',
+                                            strokeWeight: 2,
+                                            offset: "0px"
+                                        },
+                                        offset: "10px",
+                                        repeat: "100px"
+                                    }]
+                                }).setMap(map);
+                                new google.maps.Polyline({
+                                    path: remaining,
+                                    strokeColor: '#FF0000',
+                                    strokeOpacity: 0.6,
+                                    strokeWeight: 2,
+                                    icons: [{
+                                        icon: {
+                                            path: "M -3 5 L 0 0 3 5",
+                                            scale: 1,
+                                            strokeColor: '#FF0000',
+                                            strokeWeight: 2,
+                                            offset: "0px"
+                                        },
+                                        offset: "10px",
+                                        repeat: "100px"
+                                    }]
+                                }).setMap(map);
+                            });
+                        });
                     });
 
                 var queryList = [
@@ -687,6 +751,27 @@ $(function(){
                 map: map
             });
         });
+    }
+
+    function gLoc(location){
+        return new google.maps.LatLng(location.lat, location.lon);
+    }
+
+    function distanceBetween(lat1, lon1, lat2, lon2) {
+        //Radius of the earth in:  1.609344 miles,  6371 km  | var R = (6371 / 1.609344);
+        var R = 3958.7558657440545; // Radius of earth in Miles 
+        var dLat = toRad(lat2-lat1);
+        var dLon = toRad(lon2-lon1); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c;
+        return d;
+    }
+    function toRad(Value) {
+        /** Converts numeric degrees to radians */
+        return Value * Math.PI / 180;
     }
 
     //$("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
