@@ -59,7 +59,8 @@ $(function(){
 
 
     //Load favorites
-    (function loadFavorites(){
+    function loadFavorites(){
+        $("#favoriteStops > li:not([data-role=list-divider])").remove();
         var favorites = JSON.parse(localStorage["settings"]).favorites;
         if(favorites.length){
             $(favorites).each(function(){
@@ -84,8 +85,8 @@ $(function(){
             var li = $("<li>").appendTo("#favoriteStops").html("No favorite. Add by tapping the Star icon.").appendTo(li);
         }
         $('#favoriteStops').listview('refresh');
-    })();
-
+    }
+    loadFavorites();
 
     const KEY = "77b92e5ceef640868adfc924c1735ac3";
     var stops = {};
@@ -287,6 +288,9 @@ $(function(){
             ]
         });
         
+    });
+    $("#busArrival").on("pageshow", function(){
+        loadFavorites();
     });
 
     $("#busArrivalShow").on("pageshow", function(){
