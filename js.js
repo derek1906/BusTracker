@@ -36,6 +36,7 @@ function GMTEMP(){}
 window.onload = loadGoogleMaps;
 
 $(function(){
+    $.mobile.buttonMarkup.hoverDelay = 50;
 
     if(location.hash != "" && location.hash != "#busArrival"){
         $.mobile.changePage("#busArrival");
@@ -51,6 +52,39 @@ $(function(){
     //     height: /*$(window).height()*0.75*/ "100%"
     // });
 
+    //Settings Storage
+    if(!localStorage["settings"]) localStorage["settings"] = JSON.stringify({
+        favorites: []
+    });
+
+
+    //Load favorites
+    (function loadFavorites(){
+        var favorites = JSON.parse(localStorage["settings"]).favorites;
+        if(favorites.length){
+            $(favorites).each(function(){
+                var li = $("<li>").appendTo("#favoriteStops");
+                $("<a>").html(this.name).data({
+                    name: this.name,
+                    id: this.id,
+                    code: this.code
+                }).appendTo(li)
+                .click(function () {
+                    selectedStop = {
+                        id: $(this).data("id"),
+                        name: $(this).data("name"),
+                        code: $(this).data("code")
+                    };
+                    $("#stopSearchResults").empty();
+                    $.mobile.changePage("#busArrivalShow");
+                    $("#stopSearchInput").val("");;
+                });
+            });
+        }else{
+            var li = $("<li>").appendTo("#favoriteStops").html("No favorite. Add by tapping the Star icon.").appendTo(li);
+        }
+        $('#favoriteStops').listview('refresh');
+    })();
 
 
     const KEY = "77b92e5ceef640868adfc924c1735ac3";
@@ -235,6 +269,24 @@ $(function(){
                 })(key);
             }
         });
+    });
+    $("#addToFavorite").click(function(){
+        var settings = JSON.parse(localStorage["settings"]);
+        settings.favorites.push($.extend(selectedStop, {timestamp: +new Date()}));
+        localStorage["settings"] = JSON.stringify(settings);
+        createPopup({
+            title: "Added to favorites.",
+            buttons: [
+                {
+                    title: "OK",
+                    onclick: function(popup){
+                        console.log(popup);
+                        popup.popup("close");
+                    }
+                }
+            ]
+        });
+        
     });
 
     $("#busArrivalShow").on("pageshow", function(){
@@ -440,7 +492,13 @@ $(function(){
     });
 
     function sendRequest(action, data, callback, fail){
+        fail = fail ? fail : function(){};
         $(".loadingImg").show();
+        $.mobile.loading('show', {
+            text: 'Loading...',
+            textVisible: true,
+            theme: 'a'
+        });
         $.ajax({
             url: "http://developer.cumtd.com/api/v2.2/json/" + action,
             dataType: "jsonp",
@@ -448,9 +506,12 @@ $(function(){
             data: $.extend({key: KEY}, data)
         }).done(function(data){
             $(".loadingImg").hide();
+            $.mobile.loading('hide');
             callback(data);
         }).fail(function(err){
             $(".loadingImg").hide();
+            $.mobile.loading('hide');
+            console.error("Error loading AJAX.");
             fail(err);
         });
     }
@@ -577,7 +638,7 @@ $(function(){
                 select.change(runFilter);
 
             }else{
-                $("<li>").html("No bus routes currently available.").appendTo("#busArrialResults");
+                $("<li>").html("No bus route currently available.").appendTo("#busArrialResults");
             }
             $('#busArrialResults').listview('refresh');
         });
@@ -772,6 +833,37 @@ $(function(){
     function toRad(Value) {
         /** Converts numeric degrees to radians */
         return Value * Math.PI / 180;
+    }
+
+    function createPopup(obj){
+        obj = $.extend({
+            title: "",
+            text: "",
+            buttons: []
+        }, obj);
+
+        var popup = $("<div>").popup({
+            dismissible : false,
+            theme : "a",
+            overlyaTheme : "a",
+            transition : "pop"
+        }).bind("popupafterclose", function() {
+            $(this).remove();
+        });
+        if(obj.title){
+            $("<h2>").html(obj.title).appendTo(popup);
+        }
+        if(obj.text){
+            $("<p>").html(obj.text).appendTo(popup);
+        }
+        var btns = $("<div>").css("text-align", "right").appendTo(popup);
+        $(obj.buttons).each(function(){
+            var btn = this;
+            $("<button>").html(btn.title).attr("data-inline", "true")
+            .click(function(){ btn.onclick(popup); }).appendTo(btns);
+        });
+
+        popup.popup("open").trigger("create");
     }
 
     //$("/*[data-role=page]*/ #busArrival").trigger('pagecreate');

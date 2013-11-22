@@ -31,3 +31,7 @@ body{
 	width: 100%;
 	height: 100%;
 }
+
+.ui-content .ui-listview + .ui-listview{
+	margin-top: 15px;
+}
