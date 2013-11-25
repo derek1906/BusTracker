@@ -37,16 +37,37 @@
         <div data-role="page" id="busArrival" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <h1>MTD Bus Tracker</h1>
-                <a data-icon="home" id="gps" class="ui-btn-right">GPS</a>
+                <a data-icon="info" href="#about" class="ui-btn-right">About</a>
+            </div>
+            <div id="temperature" class="ui-bar ui-bar-b">
+                <div><h3>Loading...</h3></div>
+                <div style="height: 0; opacity: 0;">
+                    <h3>
+                        <span>Current Weather:</span>
+                        <img id="tempIcon" src="http://l.yimg.com/a/i/us/we/52/33.gif" width="22"/>
+                        <span>
+                            <span id="tempF">75</span><sup>o</sup>F | <span id="tempC"></span><sup>o</sup>C - <span id="tempText"></span>
+                        </span>
+                    </h3>
+                </div>
             </div>
             <div data-role="content">
-                Click on <b>GPS</b> to get closest stop or
+                <!-- Press <b>GPS</b> to get closest stop or
                 <hr/>
-                <button data-mini="true" id="selectFromMap">Select stop from map</button> or
+                -->
+                Welcome:
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button data-icon="home" data-mini="true" id="gps">Select closest stop</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button data-mini="true" id="selectFromMap">Select stop from map</button>
+                    </div>
+                </div>
                 <hr/>
-                Enter MTD stop name: <img src="loading.gif" class="loadingImg"/>
+                or, search by stop name: <img src="loading.gif" class="loadingImg"/>
                 <br />
-                <input id="stopSearchInput" type="search"/>
+                <input id="stopSearchInput" type="search" placeholder="Enter a stop name..."/>
                 <br />
                 <ul data-role="listview" id="stopSearchResults" data-autodividers="true"></ul>
                 <ul data-role="listview" id="favoriteStops">
@@ -59,7 +80,12 @@
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#busArrival" data-icon="arrow-l">Back</a>
                 <h1>MTD Bus Tracker</h1>
-                <button id="addToFavorite" data-icon="star" data-iconpos="notext" data-theme="e"></button>
+                <span id="addToFavoriteBtn" class="ui-btn-right">
+                    <button id="addToFavorite" data-icon="star" data-theme="a">Add to ★</button>
+                </span>
+                <span id="removeFavoriteBtn" class="ui-btn-right">
+                    <button id="removeFavorite" data-icon="star" data-theme="e">Remove</button>
+                </span>
             </div>
             <div data-role="content">
                 <div id="busArrivalDesc"></div>
@@ -119,12 +145,20 @@
 
         <div data-role="page" id="about" data-linkName="about">
             <div data-role="content">
-                Author: Derek 2013<br/>
-                All data are provided and owned by <a href="http://www.cumtd.com" target="_blank">CUMTD</a>.<br/>
+                Copyright 2013 Derek Leung.<br/>
+                All bus data are provided and owned by <a href="http://www.cumtd.com" target="_blank">CUMTD</a>.<br/>
+                Weather data are provided by Yahoo! Weather.<br/>
                 <button id="customRequest" data-inline="true" data-mini="true">Debug</button>
                 <hr/>
-                <button id="getAPIUsage">Get API Usage</button>
-                <div id="getAPIUsageOutput"></div>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button id="getAPIUsage" data-mini="true">View API Usage</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button id="getSettings" data-mini="true">View LocalStorage</button>
+                    </div>
+                </div>
+                <div id="appOutput"></div>
             </div>
         </div>
 

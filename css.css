@@ -1,6 +1,7 @@
 body{
 	zoom: 1;
 	-webkit-user-select: none;
+	cursor: default;
 }
 
 .loadingImg{
@@ -34,4 +35,17 @@ body{
 
 .ui-content .ui-listview + .ui-listview{
 	margin-top: 15px;
+}
+
+#appOutput > pre{
+	width: 100%;
+	overflow-y: auto;
+}
+
+#temperature > div{
+	overflow: hidden;
+}
+#temperature > div > h3 > *{
+	vertical-align: middle;
+	font-size: 15px;
 }

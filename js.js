@@ -23,6 +23,11 @@ function chaining(list, callback){
     })();
 }*/
 
+Number.prototype.roundTo = function(n){
+    return Math.round(this * Math.pow(10, n)) / Math.pow(10, n);
+}
+
+
 function loadGoogleMaps() {
     var script = document.createElement("script"),
         GMKEY = "AIzaSyDgdkU0NXg128pOqzYfld2EGP3Sk3Gbnh0";
@@ -88,6 +93,23 @@ $(function(){
     }
     loadFavorites();
 
+    //load weather
+    function loadWeather(){
+        $.get("http://query.yahooapis.com/v1/public/yql", {
+            q: "select item from weather.forecast where woeid=2377942",
+            format: "json"
+        }).success(function(data){
+            var weather = data.query.results.channel.item;
+            $("#tempF").text(weather.condition.temp);
+            $("#tempC").text(((weather.condition.temp - 32) * 5 / 9).roundTo(0));
+            $("#tempText").text(weather.condition.text);
+            $("#tempIcon").attr("src", "http://l.yimg.com/a/i/us/we/52/" + weather.condition.code + ".gif");
+            $("#temperature > div:eq(0)").animate({ height: 0, opacity: 0 }, 500);
+            $("#temperature > div:eq(1)").animate({ height: 24, opacity: 1 }, 500);
+        });
+    }
+    loadWeather();
+
     const KEY = "77b92e5ceef640868adfc924c1735ac3";
     var stops = {};
 
@@ -97,8 +119,18 @@ $(function(){
             stops[this.stop_id] = this;
         });
     }, function(err){
-        alert("Can't reach MTD server. Please make sure you have a working and fast internet connection.");
-        console.log("Error:", err);
+        createPopup({
+            text: "I'm having a hard time reaching MTD server! Please make sure you have a working and fast Internet connection.",
+            buttons: [
+                {
+                    title: "OK",
+                    onclick: function(popup){
+                        popup.popup("close");
+                    }
+                }
+            ]
+        });
+        console.error("Error:", err);
     });
 
     function getStopDetails(name){
@@ -184,6 +216,8 @@ $(function(){
     });
 
     $("#getAPIUsage").click(getAPIUsage);
+    $("#getSettings").click(getSettings);
+
     $("#gps").click(function(){
         $("#stopSearchResults").empty();
         $("<li>").html("Getting your location...").appendTo("#stopSearchResults");
@@ -275,26 +309,43 @@ $(function(){
         var settings = JSON.parse(localStorage["settings"]);
         settings.favorites.push($.extend(selectedStop, {timestamp: +new Date()}));
         localStorage["settings"] = JSON.stringify(settings);
-        createPopup({
-            title: "Added to favorites.",
-            buttons: [
-                {
-                    title: "OK",
-                    onclick: function(popup){
-                        console.log(popup);
-                        popup.popup("close");
-                    }
-                }
-            ]
-        });
-        
+
+        $("#addToFavoriteBtn").hide();
+        $("#removeFavoriteBtn").show();
     });
+
+    $("#removeFavorite").click(function(){
+        var settings = JSON.parse(localStorage["settings"]),
+            favorites = settings.favorites;
+        for(var i = 0; i < favorites.length; i++){
+            if(favorites[i].id == selectedStop.id){
+                favorites.splice(i, 1);
+                break;
+            }
+        }
+        localStorage["settings"] = JSON.stringify(settings);
+        $("#addToFavoriteBtn").show();
+        $("#removeFavoriteBtn").hide();
+    });
+
     $("#busArrival").on("pageshow", function(){
         loadFavorites();
     });
 
     $("#busArrivalShow").on("pageshow", function(){
         getDepartureByStop(selectedStop.id);
+
+        //favorite buttons
+        $("#addToFavoriteBtn").show();
+        $("#removeFavoriteBtn").hide();
+        var favorites = JSON.parse(localStorage["settings"]).favorites;
+        for(var key in favorites){
+            if(favorites[key].id == selectedStop.id){
+                $("#addToFavoriteBtn").hide();
+                $("#removeFavoriteBtn").show();
+                break;
+            }
+        }
     }).on("pagehide", function(){
         liveUpdates.timeDisplayInterval && clearInterval(liveUpdates.timeDisplayInterval);
         liveUpdates.updateInterval && clearInterval(liveUpdates.updateInterval);
@@ -496,6 +547,7 @@ $(function(){
     });
 
     function sendRequest(action, data, callback, fail){
+        var noFailFunc = !fail;
         fail = fail ? fail : function(){};
         $(".loadingImg").show();
         $.mobile.loading('show', {
@@ -517,6 +569,17 @@ $(function(){
             $.mobile.loading('hide');
             console.error("Error loading AJAX.");
             fail(err);
+            noFailFunc || createPopup({
+                text: "AJAX failed.",
+                buttons: [
+                    {
+                        title: "OK",
+                        onclick: function(popup){
+                            popup.popup("close");
+                        }
+                    }
+                ]
+            });
         });
     }
     window.sendRequest = sendRequest;
@@ -799,12 +862,20 @@ $(function(){
 
     function getAPIUsage(){
         sendRequest("GetApiUsage", null, function(data){
-            var opt = $("#getAPIUsageOutput");
+            var opt = $("#appOutput");
             opt.empty();
             $("<pre>")
                 .html(JSON.stringify(data, " ", 4))
                 .appendTo(opt);
         });
+    }
+
+    function getSettings(){
+        var opt = $("#appOutput");
+        opt.empty();
+        $("<pre>")
+            .html(JSON.stringify(JSON.parse(localStorage["settings"]), " ", 4))
+            .appendTo(opt);
     }
 
     function showGoogleMap(location){
@@ -863,12 +934,13 @@ $(function(){
         var btns = $("<div>").css("text-align", "right").appendTo(popup);
         $(obj.buttons).each(function(){
             var btn = this;
-            $("<button>").html(btn.title).attr("data-inline", "true")
+            $("<button>").html(btn.title).attr({"data-inline": "true", "data-mini": "true"})
             .click(function(){ btn.onclick(popup); }).appendTo(btns);
         });
 
         popup.popup("open").trigger("create");
     }
+    window.createPopup = createPopup;
 
     //$("/*[data-role=page]*/ #busArrival").trigger('pagecreate');
     $.mobile.activePage.trigger('pagecreate');  
