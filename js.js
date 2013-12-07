@@ -51,6 +51,9 @@ $(function(){
         return (this < 10 ? "0" : "") + this;
     };
 
+    //Global variables
+    var stops = {};
+
 
     // $("#busRouteMapView").css({
     //     width: "100%",
@@ -58,10 +61,74 @@ $(function(){
     // });
 
     //Settings Storage
-    if(!localStorage["settings"]) localStorage["settings"] = JSON.stringify({
-        favorites: []
+
+    function setDefaults(list){
+        if(!localStorage["settings"]) localStorage["settings"] = "{}";
+        if(!localStorage["cache"]) localStorage["cache"] = "{}";
+
+        var settings = JSON.parse(localStorage["settings"]),
+            cache = JSON.parse(localStorage["cache"]),
+            dSettings = list.settings,
+            dCache = list.cache;
+        for(var key in dSettings){
+            if(settings[key] == undefined){
+                settings[key] = dSettings[key];
+            }
+        }
+        for(var key in dCache){
+            if(cache[key] == undefined){
+                cache[key] = dCache[key];
+            }
+        }
+        localStorage["settings"] = JSON.stringify(settings);
+        localStorage["cache"] = JSON.stringify(cache);
+    }
+
+    setDefaults({
+        settings: {
+            favorites: []
+        },
+        cache: {
+            stopData: {
+                timestamp: 0
+            }
+        }
     });
 
+    //Cache stop data
+    function cacheStopData(){
+        var cache = JSON.parse(localStorage["cache"]);
+            stopData = cache.stopData;
+        if(+new Date() - stopData.timestamp > 604800000){
+            sendRequest("GetStops", {}, function(data){
+                var list = data.stops;
+                $(list).each(function(){
+                    stops[this.stop_id] = this;
+                });
+                cache.stopData = {
+                    stops: stops,
+                    timestamp: +new Date()
+                };
+                localStorage["cache"] = JSON.stringify(cache);
+            }, function(err){
+                createPopup({
+                    text: "I'm having a hard time reaching MTD server! Please make sure you have a working and fast Internet connection.",
+                    buttons: [
+                        {
+                            title: "OK",
+                            onclick: function(popup){
+                                popup.popup("close");
+                            }
+                        }
+                    ]
+                });
+                console.error("Error caching stop data:", err);
+            });
+        }else{
+            stops = stopData.stops;
+        }
+    }
+    cacheStopData();
 
     //Load favorites
     function loadFavorites(){
@@ -110,30 +177,9 @@ $(function(){
     }
     loadWeather();
 
-    const KEY = "77b92e5ceef640868adfc924c1735ac3";
-    var stops = {};
-
-    sendRequest("GetStops", {}, function(data){
-        var list = data.stops;
-        $(list).each(function(){
-            stops[this.stop_id] = this;
-        });
-    }, function(err){
-        createPopup({
-            text: "I'm having a hard time reaching MTD server! Please make sure you have a working and fast Internet connection.",
-            buttons: [
-                {
-                    title: "OK",
-                    onclick: function(popup){
-                        popup.popup("close");
-                    }
-                }
-            ]
-        });
-        console.error("Error:", err);
-    });
-
     function getStopDetails(name){
+        if(name == null) return "N/A";
+
         parts = name.toUpperCase().split(":");
         var selected = stops[parts[0]];
 
@@ -150,6 +196,7 @@ $(function(){
         }
     }
 
+    //Apply template
 
     $("#templateHeader").clone().removeAttr("id").prependTo("[data-role=page]:not(.customHeader)");
     $("#templateHeader").remove();
@@ -174,6 +221,7 @@ $(function(){
 
 
     $("#stopSearchInput").on("keyup", function (e) {
+        $(".loadingImg").stop().fadeIn(100);
         if (/*e.keyCode == 13 && */this.value !== "") {
             $.ajax({
                 url: "http://www.cumtd.com/autocomplete/stops/v1.0/json/search",
@@ -182,6 +230,7 @@ $(function(){
                     query: $("#stopSearchInput").val()
                 }
             }).done(function (data) {
+                $(".loadingImg").stop().fadeOut(500);
                 $("#stopSearchResults").empty();
                 var list = data;
                 if(!list.length){
@@ -211,12 +260,14 @@ $(function(){
                 $('#stopSearchResults').listview('refresh');
             });
         }else{
+            $(".loadingImg").stop().fadeOut(500);
             $("#stopSearchResults").empty();
         }
     });
 
     $("#getAPIUsage").click(getAPIUsage);
     $("#getSettings").click(getSettings);
+    $("#getCache").click(getCache);
 
     $("#gps").click(function(){
         $("#stopSearchResults").empty();
@@ -477,6 +528,58 @@ $(function(){
             $('#busRoutes').listview('refresh');
         });
     });
+    
+    $("#busSpyer").on("pageshow", function(){
+        sendRequest("GetVehicles", {}, function(data){
+            $("#busSpyerList").empty();
+
+
+            var vehicles = data.vehicles,
+                totalVehicles = 0,
+                routes = {};
+            $.each(vehicles, function(){
+                routes[this.trip.route_id] = routes[this.trip.route_id] || [];
+                routes[this.trip.route_id].push(this);
+
+                /*getStopDetails(this.origin_stop_id).stop_name*/
+            });
+
+            for(var key in routes){
+                var collapsible = $("<div>").appendTo("#busSpyerList").attr("data-role", "collapsible"),
+                    list = $("<ul>").attr({
+                            "data-role": "listview",
+                            "data-inset": "false"
+                    }).appendTo(collapsible);
+                var header = $("<h3>").html(key).prependTo(collapsible);
+                $("<span>").html(routes[key].length).addClass("ui-li-count").appendTo(header);
+                totalVehicles += routes[key].length;
+
+                $.each(routes[key], function(){
+                    var link = $("<a>"),
+                        header = $("<h3>").html("BUS #" + this.vehicle_id).appendTo(link),
+                        text = $("<p>").html(
+                            "<b>From</b> " + getStopDetails(this.origin_stop_id).stop_name + "<br>" + 
+                            "<b>To</b> " + getStopDetails(this.destination_stop_id).stop_name).appendTo(link);
+                    $("<li>").append(link).appendTo(list);
+                });
+            }
+
+            $("#busSpyerInfo").html(totalVehicles + " buses are running at this time.")
+                .append(
+                    $("<button>")
+                        .html("Refresh")
+                        .attr({
+                            "data-inline": "true",
+                            "data-mini": "true"
+                        })
+                        .click(function(){
+                            $("#busSpyer").trigger("pageshow");
+                        })
+                );
+
+            $("#busSpyerList").parent().trigger( "create" );
+        });
+    });
 
     function showGoogleMaps(options, callback){
         var title = options.title || "Map View",
@@ -547,9 +650,10 @@ $(function(){
     });
 
     function sendRequest(action, data, callback, fail){
+        const KEY = "77b92e5ceef640868adfc924c1735ac3";
         var noFailFunc = !fail;
         fail = fail ? fail : function(){};
-        $(".loadingImg").show();
+        //$(".loadingImg").show();
         $.mobile.loading('show', {
             text: 'Loading...',
             textVisible: true,
@@ -855,6 +959,35 @@ $(function(){
         });
     }
 
+    function showBusSpyerMap(){
+        $("#busSpyerMap").unbind("pageshow").on("pageshow", function(){
+            var mapView = $("#busSpyerMapView");
+            $("#busSpyerMap > div[data-role=content]").height(
+                    $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
+            );
+            options = {
+                zoom: 14,
+                center: new google.maps.LatLng(40.099, -88.226),
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                streetViewControl: false
+            };
+            var map = new google.maps.Map(mapView[0], options);
+
+            navigator.geolocation.getCurrentPosition(function(coor){
+                new google.maps.Marker({
+                    position: new google.maps.LatLng(coor.coords.latitude, coor.coords.longitude),
+                    map: map,
+                    title: "You",
+                    icon: 'http://silent-text-346.appspot.com/images/home.png',
+                    zIndex: google.maps.Marker.MAX_ZINDEX + 1
+                });
+            });
+        });
+
+        $.mobile.changePage("#busSpyerMap");
+    }
+    window.s = showBusSpyerMap;
+
     function liveInterval(){
         var d = new Date();
         $("#lastUpdated").html("(Last update: " + Math.round((d - liveUpdates.lastUpdated)/1000) + " secs ago)");
@@ -875,6 +1008,14 @@ $(function(){
         opt.empty();
         $("<pre>")
             .html(JSON.stringify(JSON.parse(localStorage["settings"]), " ", 4))
+            .appendTo(opt);
+    }
+
+    function getCache(){
+        var opt = $("#appOutput");
+        opt.empty();
+        $("<pre>")
+            .html(JSON.stringify(JSON.parse(localStorage["cache"]), " ", 4))
             .appendTo(opt);
     }
 

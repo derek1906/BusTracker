@@ -49,3 +49,14 @@ body{
 	vertical-align: middle;
 	font-size: 15px;
 }
+
+#busSpyerList a p{
+	white-space: normal;
+}
+#busSpyerMap > div[data-role=content], #busSpyerMapView{
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+.ui-collapsible-heading .ui-btn-text{ display:block;}
+.ui-collapsible-heading .ui-li-count { position: absolute; font-size: 11px; font-weight: bold; padding: .2em .5em; top: 50%; margin-top: -.9em; right: 10px;  border-radius: 1em 1em 1em 1em; background: linear-gradient(#FFFFFF, #F1F1F1) repeat scroll 0 0 #EEEEEE;  border: 1px solid #CCCCCC; color: #222222;font-weight: bold;text-shadow: 0 1px 0 #FFFFFF; }
