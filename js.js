@@ -216,7 +216,8 @@ $(function(){
             timeDisplayInterval: undefined,
             updateInterval: undefined        
         },
-        CHECK_INTERVAL = 45000;
+        CHECK_INTERVAL = 45000,
+        busSpyerInterval;
 
 
 
@@ -555,7 +556,11 @@ $(function(){
                 totalVehicles += routes[key].length;
 
                 $.each(routes[key], function(){
-                    var link = $("<a>"),
+                    var link = $("<a>").click((function(bus){
+                            return function(){
+                                showBusSpyerMap(bus);
+                            }
+                        })(this)),
                         header = $("<h3>").html("BUS #" + this.vehicle_id).appendTo(link),
                         text = $("<p>").html(
                             "<b>From</b> " + getStopDetails(this.origin_stop_id).stop_name + "<br>" + 
@@ -579,6 +584,8 @@ $(function(){
 
             $("#busSpyerList").parent().trigger( "create" );
         });
+    }).on("pagehide", function(){
+        clearInterval(busSpyerInterval);
     });
 
     function showGoogleMaps(options, callback){
@@ -643,7 +650,11 @@ $(function(){
             var data = prompt("Enter data:");
             if(data){
                 sendRequest(rq, JSON.parse(data), function(d){
-                    console.log(d);
+                    var opt = $("#appOutput");
+                    opt.empty();
+                    $("<pre>")
+                        .html(JSON.stringify(d, " ", 4))
+                        .appendTo(opt);
                 });
             }
         }
@@ -849,7 +860,7 @@ $(function(){
                     }
                 });
                 break;
-         }
+        }
     }
 
     function getVehicleById(v){
@@ -861,10 +872,11 @@ $(function(){
                 $("#vehicleName").html(v.headsign);
                 $("#vehicleId").html(bus.vehicle_id);
                 $("#vehicleLanLon")
-                    .html(bus.location.lat + "," + bus.location.lon)
+                    //.html(bus.location.lat + "," + bus.location.lon)
                     .unbind("click")
                     .click(function(){
                         //showGoogleMap(bus.location);
+                        /*
                         showGoogleMaps({ center: gLoc(bus.location) }, function(map){
                             var marker = new google.maps.Marker({
                                 position: gLoc(bus.location),
@@ -929,6 +941,8 @@ $(function(){
                                 }).setMap(map);
                             });
                         });
+                        */
+                        showBusSpyerMap(bus);
                     });
 
                 var queryList = [
@@ -959,15 +973,20 @@ $(function(){
         });
     }
 
-    function showBusSpyerMap(){
+    function showBusSpyerMap(bus){
         $("#busSpyerMap").unbind("pageshow").on("pageshow", function(){
             var mapView = $("#busSpyerMapView");
             $("#busSpyerMap > div[data-role=content]").height(
                     $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
             );
+            // - $("#busSpyerMapBar").outerHeight()
+            console.log($("#busSpyerMapBar").outerHeight());
+            $("#busSpyerMapView").height(
+                    $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
+            );
             options = {
                 zoom: 14,
-                center: new google.maps.LatLng(40.099, -88.226),
+                center: gLoc(bus.location),
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 streetViewControl: false
             };
@@ -982,6 +1001,87 @@ $(function(){
                     zIndex: google.maps.Marker.MAX_ZINDEX + 1
                 });
             });
+
+            var marker, grayLine, redLine;
+
+            function drawPath(){
+                if(grayLine != undefined) grayLine.setMap(null);
+                if(redLine != undefined) redLine.setMap(null);
+                if(marker != undefined) marker.setMap(null);
+
+                marker = new google.maps.Marker({
+                    position: gLoc(bus.location),
+                        map: map
+                });
+                sendRequest("GetShape", {shape_id: bus.trip.shape_id}, function(data){
+                    var min = -1, index = 0, pt = data.shapes,
+                        lonP = bus.location.lon, latP = bus.location.lat;
+                    for(var i = 0; i < data.shapes.length; i++){
+                        var lon = pt[i].shape_pt_lon, lat = pt[i].shape_pt_lat;
+                        var d = distanceBetween(lat, lon, latP, lonP); //find min distance
+                        if(min == -1 || d < min){
+                            min = d; index = i;
+                        }
+                    };
+                    var paths = pt.slice(0);
+                    paths.splice(index, 0, {
+                        shape_pt_lat: latP,
+                        shape_pt_lon: lonP
+                    });
+                    var passed = [], remaining = [];
+                    for(var i = 0; i < index + 1; i++){
+                        passed.push(new google.maps.LatLng(paths[i].shape_pt_lat, paths[i].shape_pt_lon));
+                    };
+                    for(var i = index; i < paths.length; i++){
+                        remaining.push(new google.maps.LatLng(paths[i].shape_pt_lat, paths[i].shape_pt_lon));
+                    };
+                    grayLine = new google.maps.Polyline({
+                        path: passed,
+                        strokeColor: '#555555',
+                        strokeOpacity: 0.6,
+                        strokeWeight: 2,
+                        icons: [{
+                            icon: {
+                                path: "M -3 5 L 0 0 3 5",
+                                scale: 1,
+                                strokeColor: '#555555',
+                                strokeWeight: 2,
+                                offset: "0px"
+                            },
+                            offset: "10px",
+                            repeat: "100px"
+                        }]
+                    });
+                    grayLine.setMap(map);
+                    redLine = new google.maps.Polyline({
+                        path: remaining,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.6,
+                        strokeWeight: 2,
+                        icons: [{
+                            icon: {
+                                path: "M -3 5 L 0 0 3 5",
+                                scale: 1,
+                                strokeColor: '#FF0000',
+                                strokeWeight: 2,
+                                offset: "0px"
+                            },
+                            offset: "10px",
+                            repeat: "100px"
+                        }]
+                    });
+                    redLine.setMap(map);
+                });
+            }
+            drawPath();
+            busSpyerInterval = setInterval(function(){
+                sendRequest("GetVehicle", {
+                    vehicle_id: bus.vehicle_id
+                },function(data){
+                    bus = data.vehicles[0];
+                    drawPath();
+                })
+            }, 60000);
         });
 
         $.mobile.changePage("#busSpyerMap");

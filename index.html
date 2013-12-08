@@ -78,7 +78,7 @@
 
         <div data-role="page" id="busArrivalShow" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a href="#busArrival" data-icon="arrow-l">Back</a>
+                <a data-rel="back" data-icon="arrow-l">Back</a>
                 <h1>MTD Bus Tracker</h1>
                 <span id="addToFavoriteBtn" class="ui-btn-right">
                     <button id="addToFavorite" data-icon="star" data-theme="a">Add to ★</button>
@@ -96,7 +96,7 @@
 
         <div data-role="page" id="vehicleDetailShow" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a href="#busArrivalShow" data-icon="arrow-l">Back</a>
+                <a data-rel="back" data-icon="arrow-l">Back</a>
                 <h1>MTD Bus Tracker</h1>
             </div>
             <div data-role="content">
@@ -104,6 +104,7 @@
                     <h3><span id="vehicleName"></span> (ID: <span id="vehicleId"></span>)</h3>
                     <br/>
                     <ul data-role="listview">
+                        <li><button id="vehicleLanLon" data-theme="e">Track this bus using Bus Spyer</button></li>
                         <li data-role="list-divider">Current Next Stop</li>
                         <li><a id="vehicleNextStop"></a></li>            
                         <li data-role="list-divider">Current Previous Stop</li>
@@ -112,8 +113,8 @@
                         <li><a id="vehicleDeparture"></a></li>
                         <li data-role="list-divider">Destination</li>
                         <li><a id="vehicleDestination"></a></li>
-                        <li data-role="list-divider">Current Location</li>
-                        <li><a id="vehicleLanLon"></a></li>
+                        <!-- <li data-role="list-divider">Current Location</li>
+                        <li><a id="vehicleLanLon"></a></li> -->
                     </ul>
                 </div>
             </div>
@@ -128,7 +129,7 @@
 
         <div data-role="page" id="busRouteMap" data-linkName="routesData" class="customHeader customFooter">
            <div data-role="header" data-tap-toggle="false" class="ui-bar-b">
-            	<a href="#" onclick="history.back();" data-icon="arrow-l" data-mini="true">Back</a><h1>Map View</h1>
+            	<a data-rel="back" data-icon="arrow-l" data-mini="true">Back</a><h1>Map View</h1>
             </div>
             <div data-role="content">
             	<div id="busRouteMapView"></div>
@@ -137,7 +138,9 @@
 
         <div data-role="page" id="busSpyer" data-linkName="busSpyer">
             <div data-role="content">
-                <p>Bus Spyer lets you track the location of every vehicle running at this moment. Choose a vehicle below to begin.</p>
+                <p>Bus Spyer lets you track the location of every vehicle running at this moment. Bus Spyer will automatcally update its location every minute.<br>
+                <br>
+                Choose a vehicle below to begin.</p>
                 <p id="busSpyerInfo"></p>
                 <div data-role="collapsible-set" data-inset="false" id="busSpyerList"></div>
             </div>
@@ -145,10 +148,13 @@
 
         <div data-role="page" id="busSpyerMap" data-linkName="busSpyer" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a href="#busArrivalShow" data-icon="arrow-l">Back</a>
+                <a data-rel="back" data-icon="arrow-l">Back</a>
                 <h1>Bus Spyer</h1>
             </div>
             <div data-role="content">
+                <div id="busSpyerMapBar" class="ui-bar ui-bar-b">
+                    <h3>Bus Spyer will update location every minute.</h3>
+                </div>
                 <div id="busSpyerMapView"></div>
             </div>
         </div>
