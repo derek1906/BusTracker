@@ -33,7 +33,7 @@ body{
 	height: 100%;
 }
 #busRouteMapView{
-	margin-top: 35px;
+	/*margin-top: 35px;*/
 }
 
 .ui-content .ui-listview + .ui-listview{
