@@ -600,9 +600,11 @@ $(function(){
 
         $("#busRouteMap").unbind("pageshow pagehide").on("pageshow", function(){
             function adjustHeight(){
-                $("#busRouteMap > div[data-role=content]").height(
-                    $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
-                );
+                setTimeout(function(){
+                    $("#busRouteMap > div[data-role=content]").height(
+                        $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
+                    );
+                }, 500);
             }
             adjustHeight();
             $(window).on("orientationchange", adjustHeight);
@@ -985,12 +987,14 @@ $(function(){
         $("#busSpyerMap").unbind("pageshow").on("pageshow", function(){
             var mapView = $("#busSpyerMapView");
             function adjustHeight(){
-                $("#busSpyerMap > div[data-role=content]").height(
-                        $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
-                );
-                $("#busSpyerMapView").height(
-                        $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
-                );
+                setTimeout(function(){
+                    $("#busSpyerMap > div[data-role=content]").height(
+                            $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
+                    );
+                    $("#busSpyerMapView").height(
+                            $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
+                    );
+                }, 500);
             }
             adjustHeight();
             $(window).unbind("orientationchange").on("orientationchange", adjustHeight);
