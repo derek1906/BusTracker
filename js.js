@@ -585,8 +585,9 @@ $(function(){
             $("#busSpyerList").parent().trigger( "create" );
         });
     });
-    $("#busSpyer, #busSpyerMap").on("pagehide", function(){
+    $("#busSpyerMap").on("pagehide", function(){
         clearInterval(busSpyerInterval);
+        $(this).unbind("orientationchange");
     });
 
     function showGoogleMaps(options, callback){
@@ -597,11 +598,15 @@ $(function(){
 
         if(options.title) delete options.title;
 
-        $("#busRouteMap").unbind("pageshow").on("pageshow", function(){
-            $("#busRouteMap > div[data-role=content]").height(
-                $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
-            );
-            console.log($("#busRouteMapView").parent().height());
+        $("#busRouteMap").unbind("pageshow pagehide").on("pageshow", function(){
+            function adjustHeight(){
+                $("#busRouteMap > div[data-role=content]").height(
+                    $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
+                );
+            }
+            adjustHeight();
+            $(this).on("orientationchange", adjustHeight);
+
             options = $.extend(
                 {
                     zoom: 14,
@@ -622,6 +627,8 @@ $(function(){
                     zIndex: google.maps.Marker.MAX_ZINDEX + 1
                 });
             });
+        }).on("pagehide", function(){
+            $(this).unbind("orientationchange");
         });
 
         $.mobile.changePage("#busRouteMap");
@@ -977,14 +984,17 @@ $(function(){
     function showBusSpyerMap(bus){
         $("#busSpyerMap").unbind("pageshow").on("pageshow", function(){
             var mapView = $("#busSpyerMapView");
-            $("#busSpyerMap > div[data-role=content]").height(
-                    $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
-            );
-            // - $("#busSpyerMapBar").outerHeight()
-            console.log($("#busSpyerMapBar").outerHeight());
-            $("#busSpyerMapView").height(
-                    $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
-            );
+            function adjustHeight(){
+                $("#busSpyerMap > div[data-role=content]").height(
+                        $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - 60
+                );
+                $("#busSpyerMapView").height(
+                        $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
+                );
+            }
+            adjustHeight();
+            $(this).unbind("orientationchange").on("orientationchange", adjustHeight);
+
             options = {
                 zoom: 14,
                 center: gLoc(bus.location),
