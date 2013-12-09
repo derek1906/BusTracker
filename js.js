@@ -587,7 +587,7 @@ $(function(){
     });
     $("#busSpyerMap").on("pagehide", function(){
         clearInterval(busSpyerInterval);
-        $(this).unbind("orientationchange");
+        $(window).unbind("orientationchange");
     });
 
     function showGoogleMaps(options, callback){
@@ -605,7 +605,7 @@ $(function(){
                 );
             }
             adjustHeight();
-            $(this).on("orientationchange", adjustHeight);
+            $(window).on("orientationchange", adjustHeight);
 
             options = $.extend(
                 {
@@ -628,7 +628,7 @@ $(function(){
                 });
             });
         }).on("pagehide", function(){
-            $(this).unbind("orientationchange");
+            $(window).unbind("orientationchange");
         });
 
         $.mobile.changePage("#busRouteMap");
@@ -993,7 +993,7 @@ $(function(){
                 );
             }
             adjustHeight();
-            $(this).unbind("orientationchange").on("orientationchange", adjustHeight);
+            $(window).unbind("orientationchange").on("orientationchange", adjustHeight);
 
             options = {
                 zoom: 14,
