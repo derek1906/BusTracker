@@ -604,6 +604,7 @@ $(function(){
                     $("#busRouteMap > div[data-role=content]").height(
                         $(window).height() - $("#busRouteMap > div[data-role=header]").outerHeight()
                     );
+                    google.maps.event.trigger(map, "resize");
                 }, 500);
             }
             adjustHeight();
@@ -994,6 +995,7 @@ $(function(){
                     $("#busSpyerMapView").height(
                             $(window).height() - $("#busSpyerMap > div[data-role=header]").outerHeight() - $("#busSpyerMapBar").outerHeight() - 60
                     );
+                    google.maps.event.trigger(map, "resize");
                 }, 500);
             }
             adjustHeight();
