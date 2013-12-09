@@ -217,7 +217,7 @@ $(function(){
             updateInterval: undefined        
         },
         CHECK_INTERVAL = 45000,
-        busSpyerInterval;
+        busSpyerInterval = 0;
 
 
 
@@ -584,7 +584,8 @@ $(function(){
 
             $("#busSpyerList").parent().trigger( "create" );
         });
-    }).on("pagehide", function(){
+    });
+    $("#busSpyer, #busSpyerMap").on("pagehide", function(){
         clearInterval(busSpyerInterval);
     });
 
@@ -1081,7 +1082,7 @@ $(function(){
                     bus = data.vehicles[0];
                     drawPath();
                 })
-            }, 60000);
+            }, 45000);
         });
 
         $.mobile.changePage("#busSpyerMap");
