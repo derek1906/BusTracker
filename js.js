@@ -40,6 +40,22 @@ function GMTEMP(){}
 
 window.onload = loadGoogleMaps;
 
+$.get("http://query.yahooapis.com/v1/public/yql").fail(function(e){
+    if(!e.status){
+        createPopup({
+            title: "Uh oh!",
+            text: "Please make sure you have internet connection.",
+            buttons: [{
+                title: "OK",
+                onclick: function(popup){
+                    popup.popup("close");
+                }
+            }]
+        });
+        console.warn("No interenet connection!");
+    }
+});
+
 $(function(){
     $.mobile.buttonMarkup.hoverDelay = 50;
 
@@ -173,6 +189,9 @@ $(function(){
             $("#tempIcon").attr("src", "http://l.yimg.com/a/i/us/we/52/" + weather.condition.code + ".gif");
             $("#temperature > div:eq(0)").animate({ height: 0, opacity: 0 }, 500);
             $("#temperature > div:eq(1)").animate({ height: 24, opacity: 1 }, 500);
+        }).fail(function(){
+            $("#temperature > div:eq(0)").animate({ height: 0, opacity: 0 }, 500);
+            $("#temperature > div:eq(1)").text("Failed to load resources").animate({ height: 24, opacity: 1 }, 500);
         });
     }
     loadWeather();
