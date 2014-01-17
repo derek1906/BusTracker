@@ -10,6 +10,8 @@
         Derek Leung
     </author>
 
+    <icon src="icon.png" />
+
     <preference name="http://api.phonegap.com/1.0/geolocation"/>
     <preference name="http://api.phonegap.com/1.0/network"/>
 

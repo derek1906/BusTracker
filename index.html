@@ -1,12 +1,30 @@
 <!DOCTYPE HTML>
 <html>
     <head>
+    	<title>Bus Tracker</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
         <meta charset="utf-8">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/images/touch-icon-precomposed.png">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link href="/images/apple-touch-startup-image-1536x2008.png"
+		      media="(device-width: 768px) and (device-height: 1024px)
+		         and (orientation: portrait)
+		         and (-webkit-device-pixel-ratio: 2)"
+		      rel="apple-touch-startup-image">
+		<!-- iPad (Retina, landscape) -->
+		<link href="/images/apple-touch-startup-image-1496x2048.png"
+		      media="(device-width: 768px) and (device-height: 1024px)
+		         and (orientation: landscape)
+		         and (-webkit-device-pixel-ratio: 2)"
+		      rel="apple-touch-startup-image">
+
         <link type="text/css" rel="stylesheet" href="jquery-theme-green.min.css">
         <link type="text/css" rel="stylesheet" href="jquery.mobile-1.3.2.min.css">
         <link type="text/css" rel="stylesheet" href="css.css">
-        <script src="jquery.js"></script>
+        <script src="/fastclick.js"></script>
+        <script src="/jquery.js"></script>
         <script>
         	$(document).bind("mobileinit", function(){
 				$.mobile.defaultPageTransition = "pop";
@@ -14,13 +32,13 @@
                 // $.mobile.page.prototype.options.footerTheme = "d";
 			});
         </script>
-        <script src="jquery.mobile-1.3.2.min.js"></script>
-        <script src="js.js"></script>
+        <script src="/jquery.mobile-1.3.2.min.js"></script>
+        <script src="/js.js"></script>
     </head>
     <body>
         <!-- Templates -->
         <div data-role="header" data-id="default" data-position="fixed" id="templateHeader" data-tap-toggle="false">
-             <h1>MTD Bus Tracker</h1>
+             <h1>CU Bus Tracker</h1>
         </div>
         <div data-role="footer" data-id="default" data-position="fixed" id="templateFooter" data-tap-toggle="false">
             <div data-role="navbar">
@@ -36,7 +54,7 @@
 
         <div data-role="page" id="busArrival" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <h1>MTD Bus Tracker</h1>
+                <h1>CU Bus Tracker</h1>
                 <a data-icon="info" href="#about" class="ui-btn-right">About</a>
             </div>
             <div id="temperature" class="ui-bar ui-bar-b">
@@ -79,7 +97,7 @@
         <div data-role="page" id="busArrivalShow" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a data-rel="back" data-icon="arrow-l">Back</a>
-                <h1>MTD Bus Tracker</h1>
+                <h1>CU Bus Tracker</h1>
                 <span id="addToFavoriteBtn" class="ui-btn-right">
                     <button id="addToFavorite" data-icon="star" data-theme="a">Add to ★</button>
                 </span>
@@ -97,7 +115,7 @@
         <div data-role="page" id="vehicleDetailShow" data-linkName="busArrival" class="customHeader">
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a data-rel="back" data-icon="arrow-l">Back</a>
-                <h1>MTD Bus Tracker</h1>
+                <h1>CU Bus Tracker</h1>
             </div>
             <div data-role="content">
                 <div id="vehicleDetailDesc">
@@ -138,7 +156,7 @@
 
         <div data-role="page" id="busSpyer" data-linkName="busSpyer">
             <div data-role="content">
-                <p>Bus Spyer lets you track the location of every vehicle running at this moment. Bus Spyer will automatcally update its location every minute.<br>
+                <p>Bus Spyer lets you track the location of every vehicle running at this moment. Bus Spyer will automatically update its location every minute.<br>
                 <br>
                 Choose a vehicle below to begin.</p>
                 <p id="busSpyerInfo"></p>
@@ -168,11 +186,11 @@
 
         <div data-role="page" id="about" data-linkName="about">
             <div data-role="content">
-                Copyright 2013 Derek Leung.<br/>
+                Copyright 2013-2014 Derek Leung.<br/>
                 All bus data are provided and owned by <a href="http://www.cumtd.com" target="_blank">CUMTD</a>.<br/>
                 Weather data are provided by Yahoo! Weather.<br/>
                 <br/>
-                Bus stop data are cached to reduce data transmission, updated per 5 days.
+                Bus stop data are cached to reduce data transmission, updates every 5 days.
                 <button id="customRequest" data-inline="true" data-mini="true">Debug</button>
                 <hr/>
                 <div class="ui-grid-b">
