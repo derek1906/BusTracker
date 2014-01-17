@@ -11,6 +11,10 @@
     </author>
 
     <icon src="icon.png" />
+    <icon src="icons/android/icon.png" gap:platform="android" gap:density="ldpi" />
+    <icon src="icons/android/icon.png" gap:platform="android" gap:density="mdpi" />
+    <icon src="icons/android/icon.png" gap:platform="android" gap:density="hdpi" />
+    <icon src="icons/android/icon.png" gap:platform="android" gap:density="xhdpi" />
 
     <preference name="http://api.phonegap.com/1.0/geolocation"/>
     <preference name="http://api.phonegap.com/1.0/network"/>
