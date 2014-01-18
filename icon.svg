@@ -133,6 +133,38 @@
        r="110.79071"
        gradientTransform="matrix(1,0,0,0.66135457,0,-7.2704195)"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3006-4"
+       id="linearGradient3012-3"
+       x1="72.389153"
+       y1="151.1172"
+       x2="72.389153"
+       y2="2.7545331"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient3006-4">
+      <stop
+         style="stop-color:#fcf3e0;stop-opacity:1;"
+         offset="0"
+         id="stop3008-5" />
+      <stop
+         style="stop-color:#f7dfac;stop-opacity:1;"
+         offset="1"
+         id="stop3010-0" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3838">
+      <rect
+         style="opacity:0.98000004;fill:#ffffff;fill-opacity:1;stroke:none"
+         id="rect3840"
+         width="104.52602"
+         height="139.78947"
+         x="18.249659"
+         y="-26.712706"
+         ry="20.364069" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -141,9 +173,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.6019737"
-     inkscape:cx="50.529187"
-     inkscape:cy="53.51934"
+     inkscape:zoom="2.2655329"
+     inkscape:cx="48.761937"
+     inkscape:cy="56.515128"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -160,7 +192,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -178,14 +210,15 @@
        ry="22.142859" />
     <path
        sodipodi:type="arc"
-       style="opacity:1;fill:url(#radialGradient3794);fill-opacity:1;stroke:none"
+       style="fill:url(#radialGradient3794);fill-opacity:1;stroke:none"
        id="path3784"
        sodipodi:cx="71.064957"
        sodipodi:cy="-21.46912"
        sodipodi:rx="110.79071"
        sodipodi:ry="73.271942"
        d="m 181.85567,-21.46912 a 110.79071,73.271942 0 1 1 -221.581424,0 110.79071,73.271942 0 1 1 221.581424,0 z"
-       transform="matrix(1.4541833,0,0,1.0873494,-26.53835,29.021245)" />
+       transform="matrix(1.4541833,0,0,1.1098365,-26.53835,27.856348)"
+       clip-path="url(#clipPath3838)" />
   </g>
   <g
      inkscape:label="front"
