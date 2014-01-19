@@ -52,7 +52,8 @@ $.get("http://query.yahooapis.com/v1/public/yql").fail(function(e){
                 }
             }]
         });
-        console.warn("No interenet connection!");
+
+        console.warn("No internet connection.");
     }
 });
 
@@ -192,7 +193,7 @@ $(function(){
             $("#temperature > div:eq(1)").animate({ height: 24, opacity: 1 }, 500);
         }).fail(function(){
             $("#temperature > div:eq(0)").animate({ height: 0, opacity: 0 }, 500);
-            $("#temperature > div:eq(1)").text("Failed to load resources").animate({ height: 24, opacity: 1 }, 500);
+            $("#temperature > div:eq(1)").text("Failed to load resources").animate({ height: 20, opacity: 1 }, 500);
         });
     }
     loadWeather();
@@ -715,8 +716,10 @@ $(function(){
             $.mobile.loading('hide');
             console.error("Error loading AJAX.");
             fail(err);
-            noFailFunc || createPopup({
-                text: "AJAX failed.",
+            console.log(err);
+            noFailFunc && createPopup({
+                title: "Bump!",
+                text: "Looks like your device forgot how to internet.<br><br><span class='small'>Error: Cannot connect to server (status: " + err.status + " - " + err.statusText + ")</span>",
                 buttons: [
                     {
                         title: "OK",
@@ -1195,10 +1198,10 @@ $(function(){
             buttons: []
         }, obj);
 
-        var popup = $("<div>").popup({
+        var popup = $("<div>").css("padding", "5px 10px").popup({
             dismissible : false,
-            theme : "a",
-            overlyaTheme : "a",
+            theme : "c",
+            overlayTheme : "a",
             transition : "pop"
         }).bind("popupafterclose", function() {
             $(this).remove();
@@ -1212,7 +1215,7 @@ $(function(){
         var btns = $("<div>").css("text-align", "right").appendTo(popup);
         $(obj.buttons).each(function(){
             var btn = this;
-            $("<button>").html(btn.title).attr({"data-inline": "true", "data-mini": "true"})
+            $("<button>").html(btn.title).attr({"data-inline": "true", "data-theme": "c"})
             .click(function(){ btn.onclick(popup); }).appendTo(btns);
         });
 

@@ -62,7 +62,7 @@
                 <div style="height: 0; opacity: 0;">
                     <h3>
                         <span>Current Weather:</span>
-                        <img id="tempIcon" src="http://l.yimg.com/a/i/us/we/52/33.gif" width="22"/>
+                        <img id="tempIcon" src="about:blank" width="22"/>
                         <span>
                             <span id="tempF"></span><sup>o</sup>F | <span id="tempC"></span><sup>o</sup>C - <span id="tempText"></span>
                         </span>
@@ -186,10 +186,13 @@
 
         <div data-role="page" id="about" data-linkName="about">
             <div data-role="content">
-                Copyright 2013-2014 Derek Leung.<br/>
-                All bus data are provided and owned by <a href="http://www.cumtd.com" target="_blank">CUMTD</a>.<br/>
-                Weather data are provided by Yahoo! Weather.<br/>
-                <br/>
+            	<div>
+            		<img src="icons/android/xhdpi.png" style="float: left; margin: 0px 8px 8px 0px; box-shadow: 0px 2px 10px #CCC; border-radius: 15px;">
+                	Copyright 2013-2014 Derek Leung.<br/>
+                	Bus data are provided and owned by <a href="http://www.cumtd.com" target="_blank">Champaign-Urbana Mass Transit District</a>.<br/>
+                	Weather data are provided by <a href="http://www.yahoo.com" target="_blank">Yahoo! Weather</a>.<br>
+                </div>
+                <div style="clear: both;"></div>
                 Bus stop data are cached to reduce data transmission, updates every 5 days.
                 <button id="customRequest" data-inline="true" data-mini="true">Debug</button>
                 <hr/>
