@@ -354,7 +354,7 @@ $(function(){
                         position: new google.maps.LatLng(midCoor[0]/midCoor[2], midCoor[1]/midCoor[2]),
                         map: map,
                         title: stops[key].stop_name,
-                        icon: '/images/busstop.png'
+                        icon: 'images/busstop.png'
                     });
                     google.maps.event.addListener(mark, 'click', function() {
                         selectedStop = {
@@ -647,7 +647,7 @@ $(function(){
                     position: new google.maps.LatLng(coor.coords.latitude, coor.coords.longitude),
                     map: map,
                     title:"You",
-                    icon: '/images/home.png',
+                    icon: 'images/home.png',
                     zIndex: google.maps.Marker.MAX_ZINDEX + 1
                 });
             });
@@ -1037,7 +1037,7 @@ $(function(){
                     position: new google.maps.LatLng(coor.coords.latitude, coor.coords.longitude),
                     map: map,
                     title: "You",
-                    icon: '/images/home.png',
+                    icon: 'images/home.png',
                     zIndex: google.maps.Marker.MAX_ZINDEX + 1
                 });
             });
